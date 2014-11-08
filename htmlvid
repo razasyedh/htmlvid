@@ -364,6 +364,9 @@ def build_cmd(args):
         verbosity = "info"
     cmd += " -loglevel %s" % verbosity
 
+    if USE_ALL_THREADS:
+        cmd += " -threads 0"
+
     if not args.duplicate:
         seek_cmd = " -ss %s" % args.start
     else:
@@ -388,19 +391,29 @@ def build_cmd(args):
     cmd += " -c:v %s" % codec
 
     if args.limit is None:
+        # Constant quality mode
         cmd += " -crf %s" % args.quality
-        cmd += " -b:v %s" % args.bitrate
+        if args.format == "webm":
+            cmd += " -b:v %s" % args.bitrate
+        else:
+            cmd += " -preset %s" % MP4_PRESET
     else:
         bitrate = calculate_bitrate(args.limit, args.to)
-        cmd += " -b:v %s" % bitrate
+        # Constant bitrate mode
+        cmd += " -b:v %s -minrate %s -maxrate %s" % (bitrate, bitrate, bitrate)
 
     filters = get_filters(args)
     if filters != "":
         cmd += " -vf '%s'" % filters
 
-    # Exclude sound
-    if not args.sound:
+    if args.sound:
+        # Enable experimental encoders and downmux to two channels
+        cmd += " -strict experimental -ac 2"
+    else:
         cmd += " -an"
+
+    # Disable subtitles
+    cmd += " -sn"
 
     if args.twopass:
         cmd += " -pass 1"
@@ -494,6 +507,8 @@ if __name__ == "__main__":
     else: # Unix
         FFMPEG_BIN = "ffmpeg"
         FFPROBE_BIN = "ffprobe"
+    USE_ALL_THREADS = True # Whether to multithread or not
+    MP4_PRESET = "slower" # libx264 default: medium
 
     try:
         main()
