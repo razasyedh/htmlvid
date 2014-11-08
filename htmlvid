@@ -139,7 +139,7 @@ def get_args():
                         help="Use once to make %(prog)s verbose, twice to show"
                              " FFmpeg output, and three times for both.")
     group1.add_argument("-V", "--version", action="version",
-                        version="%(prog)s 1.0.0", help="Print version number.")
+                        version="%(prog)s 0.7.0", help="Print version number.")
 
     group2 = parser.add_argument_group("Time Options",)
     group2.add_argument("-s", "--start", metavar="time", type=time_stamp,
