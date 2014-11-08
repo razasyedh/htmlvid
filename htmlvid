@@ -210,13 +210,19 @@ def get_duration(args):
     return args
 
 def get_filters(args):
-    """Chain together filters for the -vf portion of our command"""
-    filterlist = [args.width, args.embed, args.filters]
+    """Chain together filters for the -vf portion of our command."""
+    # Create our width filter if we didn't enter 0
+    if args.width is None or args.width == 0:
+        width_filter = None
+    else:
+        width_filter = "scale=%s:-1" % args.width
+
+    filterlist = [width_filter, args.embed, args.filters]
     filter_cmd = ""
 
     for filters in filterlist:
         if filters is not None:
-            filter_cmd = filter_cmd + ","
+            filter_cmd = filter_cmd + filters + ","
 
     # Remove trailing comma
     filter_cmd = filter_cmd[:-1]
