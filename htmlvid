@@ -290,13 +290,7 @@ def build_cmd(args):
     """Build our ffmpeg command from our arguments"""
     cmd = ""
 
-    if os.name == "nt":
-        ffmpeg_bin = "ffmpeg.exe"
-        ffprobe_bin = "ffprobe.exe"
-    else:
-        ffmpeg_bin = "ffmpeg"
-        ffprobe_bin = "ffprobe"
-    cmd += ffmpeg_bin
+    cmd += FFMPEG_BIN
 
     cmd += " -y"
     cmd += " -threads 0"
@@ -393,6 +387,13 @@ def main():
     sys.exit(0)
 
 if __name__ == "__main__":
+    if os.name == "nt":
+        FFMPEG_BIN = "ffmpeg.exe"
+        FFPROBE_BIN = "ffprobe.exe"
+    else:
+        FFMPEG_BIN = "ffmpeg"
+        FFPROBE_BIN = "ffprobe"
+
     try:
         main()
     except KeyboardInterrupt:
