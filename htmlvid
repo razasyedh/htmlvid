@@ -303,7 +303,10 @@ def build_cmd(args):
         verbosity = "info"
     cmd += " -loglevel %s" % verbosity
 
-    seek_cmd = " -ss %s" % args.start
+    if not args.duplicate:
+        seek_cmd = " -ss %s" % args.start
+    else:
+        seek_cmd = ""
     input_cmd = " -i '%s'" % args.video
     if args.embed is None:
         # fast seek if not embedding subs
@@ -311,15 +314,8 @@ def build_cmd(args):
     else:
         cmd = cmd + input_cmd + seek_cmd
 
-    # If copying, get video duration
-    if args.duplicate:
-        args.to = get_full_duration(ffprobe_bin, args.video)
-
-    # If duration is a timestamp, convert to a duration
-    semicolons = args.to.count(":")
-    if semicolons > 0:
-        args.to = calculate_duration(args)
-    cmd += " -t %s" % args.to
+    if not args.duplicate:
+        cmd += " -t %s" % args.to
 
     if args.mp4:
         codec = "libx264"
