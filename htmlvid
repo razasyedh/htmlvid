@@ -224,18 +224,21 @@ def get_filters(args):
     return filter_cmd
 
 def timestamp_to_ms(timestamp):
-    """Break up a timestamp and convert it to milliseconds"""
+    """Break up a timestamp and convert it to milliseconds."""
     # "hh" : "mm" : "ss.xxx"
     hms = timestamp.split(":")
     # Convert seconds and milliseconds to a list
     hms[2] = hms[2].split(".")
     # If there aren't any milliseconds
     if len(hms[2]) != 2:
-        hms[2][1] = 0
+        has_ms = False
+    else:
+        has_ms = True
 
-    millisec = (hms[0] * 3600 + hms[1] * 60 + hms[2][0]) * 1000 + hms[2][1]
+    millisec = (int(hms[0]) * 3600 + int(hms[1]) * 60 + int(hms[2][0])) * 1000
+    if has_ms:
+        millisec += int(hms[2][1])
 
-    print "Returning: ", millisec
     return millisec
 
 def calculate_duration(args):
