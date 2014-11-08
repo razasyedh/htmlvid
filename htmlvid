@@ -408,8 +408,8 @@ def build_cmd(args):
 
     cmd = FFMPEG_BIN + " -y -vstats_file log.txt"
 
-    # Set the proper verbosity for ffmpeg. Default only shows errors.
-    if args.verbose is None:
+    # Set the proper verbosity for FFmpeg
+    if args.verbose is None or args.verbose == 1:
         verbosity = "error"
     else:
         verbosity = "info"
