@@ -270,12 +270,12 @@ def get_filters(args):
     if args.width is None or args.width == 0:
         width_filter = None
     else:
-        width_filter = "scale=%s:-1" % args.width
-
-    filterlist = [width_filter, args.embed, args.filters]
-    filter_cmd = ""
-
-    for filters in filterlist:
+        if args.format == "webm":
+            # min() makes sure we don't scale larger than our video size
+            width_filter = "scale=min(%s\\,iw):-1" % args.width
+        else:
+            # For mp4 we have to make sure our new dimensions are even numbers
+            width_filter = "scale=min(%s\\,iw):trunc(ow/a/2)*2" % args.width
         if filters is not None:
             filter_cmd = filter_cmd + filters + ","
 
