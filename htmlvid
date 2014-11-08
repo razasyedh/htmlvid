@@ -258,15 +258,14 @@ def calculate_duration(args):
 
     return str(difference_s)
 
-def calculate_bitrate(args):
-    """Calculate the optimal bitrate for our size limit"""
-    limit = args.limit
+def calculate_bitrate(limit, duration):
+    """Calculate the optimal bitrate for our size limit."""
     size_limit = float(limit[:-1])
     # Convert megabyte to kilobyte
     if limit.endswith("M"):
         size_limit *= 1024
 
-    vid_duration = float(args.to)
+    vid_duration = float(duration)
 
     new_limit = size_limit / vid_duration * 8
     new_limit = str(round(new_limit, 2)) + "K"
@@ -340,8 +339,7 @@ def build_cmd(args):
         cmd += " -crf %s" % args.quality
         cmd += " -b:v %s" % args.bitrate
     else:
-        bitrate = calculate_bitrate(args)
-        # cmd += " -crf 0"
+        bitrate = calculate_bitrate(args.limit, args.to)
         cmd += " -b:v %s" % bitrate
 
     filters = get_filters(args)
