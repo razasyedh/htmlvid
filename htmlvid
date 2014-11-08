@@ -452,37 +452,3 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         sys.stderr.write("User sent keyboard interrupt. Exiting...\n")
         exit(1)
-
-# TODO:
-
-#   B:V (max bitrate for crf) have no effect for mp4's. have to use presets?
-#       (So how come -l works???)
-#   mp4 size with -l is a bit high
-
-#   Verbose mode
-#   Progress bar
-#   embed filter (extract the subs) and others
-#   config support
-#   use -video_size instead of the size filter
-#   throw a warning for very long durations
-#   option to take snapshot at time. should require -s or -t
-#   gif support???
-
-#   Option to upload result to gfycat/mediacrush?
-#   http://www.gfycat.com/api
-#   https://mediacru.sh/docs/api
-
-
-# sub-commands to concat/cut/other??
-
-# detect what flags ffmpeg was compiled with to remove unused options
-# (ffmpeg -hide_banner -buildconf)
-
-
-# https://trac.ffmpeg.org/wiki/Encode/VP8
-# https://trac.ffmpeg.org/wiki/Encode/H.264
-# https://blog.mediacru.sh/2013/12/23/The-right-way-to-encode-HTML5-video.html
-# constant quality mode is reccomended for libpvx
-# -q uses Variable bitrate, -l uses constant quality
-# This version of ffmpeg has nonfree parts compiled in. Therefore it is not
-# legally redistributable.
