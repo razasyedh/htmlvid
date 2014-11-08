@@ -100,16 +100,13 @@ def ffmpeg_options(string):
     return string
 
 def subtitle(string):
-    """Test if our subtitle file exists."""
-    if string == "0":
+    """Test that the specified subtitle file exists."""
+    exists = os.path.isfile(string)
+    if exists or string == "0":
         return string
     else:
-        exists = os.path.isfile(string)
-        if exists:
-            return string
-        else:
-            msg = "%r not found." % string
-            raise configargparse.ArgumentTypeError(msg)
+        msg = "%s not found." % string
+        raise configargparse.ArgumentTypeError(msg)
 
 def get_args():
     """Obtain the arguments entered for our program on the command line."""
