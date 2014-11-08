@@ -27,9 +27,21 @@ def video_file(string):
         raise configargparse.ArgumentTypeError(msg)
 
 def time_stamp(string):
-    """Prepend hours to our timestamp if the user omitted them."""
+    """Test that the timestamp given is proper and prepend zeroes to our
+    timestamp if the user omitted them to prepare it for calculate_duration().
+    """
+    leading_digits_count = len(string.split(":")[0])
+    if leading_digits_count == 1:
+        string = "0" + string
+
     semicolon_count = string.count(":")
-    if semicolon_count == 1:
+    if semicolon_count == 0:
+        if len(string) > 2:
+            msg = "%s is not a proper timestamp." % string
+            raise configargparse.ArgumentTypeError(msg)
+
+        string = "00:00:" + string
+    elif semicolon_count == 1:
         string = "00:" + string
 
     return string
