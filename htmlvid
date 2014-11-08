@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-# Convert dict back to Namespace????
-
 """htmlvid
 
 A tool to create html5 snippets of videos.
@@ -248,7 +246,7 @@ def timestamp_to_ms(timestamp):
     return millisec
 
 def calculate_duration(args):
-    """Calculate the duration of our video if the -t arg is a timestamp"""
+    """Calculate the duration of our video if the -t arg is a timestamp."""
     # Calculate the difference between the two timestamps converted to ms
     beginning = timestamp_to_ms(args.start)
     end = timestamp_to_ms(args.to)
@@ -282,12 +280,13 @@ def get_full_duration(ffprobe, video_path):
     # [FORMAT]\nduration=s.xxxxx\n[/FORMAT]\n
     duration_line = metadata.splitlines()[1]
     # duration=s.xxxxx
-    metadata_duration = duration_line.split("=")[1]
+    metadata_duration = duration_line.split("=")[1][:-2]
 
+    # s.xxx
     return metadata_duration
 
 def build_cmd(args):
-    """Build our ffmpeg command from our arguments"""
+    """Build our ffmpeg command from our arguments."""
     cmd = ""
 
     cmd += FFMPEG_BIN
@@ -334,7 +333,7 @@ def build_cmd(args):
 
     filters = get_filters(args)
     if filters != "":
-        cmd += " -vf %s" % filters
+        cmd += " -vf '%s'" % filters
 
     # Exclude sound
     if not args.sound:
@@ -354,7 +353,7 @@ def build_cmd(args):
         filename = args.output
     cmd += " '%s'" % filename
 
-    print cmd
+    print cmd, "\n"
     return cmd
 
 def run_cmd(cmd, passes):
@@ -375,9 +374,6 @@ def main():
     """
     arguments = get_args()
 
-    # for key in var(arguments):
-    #     print key, ":", arguments[key]
-    # print "\n\n"
 
     command = build_cmd(arguments)
 
@@ -400,14 +396,28 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        sys.stderr.write("User sent keyboard interrupt. Exiting...")
+        sys.stderr.write("User sent keyboard interrupt. Exiting...\n")
         exit(1)
 
-# prepend the zeroes in timestamp
+# TODO:
 
-# try variable bitrate only for -l (-b:v) and leave out the -crf
-# B:V (max bitrate for crf) might have no effect for mp4's. test it out, might
-#  have to use presets
+#   B:V (max bitrate for crf) have no effect for mp4's. have to use presets?
+#       (So how come -l works???)
+#   mp4 size with -l is a bit high
+
+#   Verbose mode
+#   Progress bar
+#   embed filter (extract the subs) and others
+#   config support
+#   use -video_size instead of the size filter
+#   throw a warning for very long durations
+#   option to take snapshot at time. should require -s or -t
+#   gif support???
+
+#   Option to upload result to gfycat/mediacrush?
+#   http://www.gfycat.com/api
+#   https://mediacru.sh/docs/api
+
 
 # sub-commands to concat/cut/other??
 
@@ -417,6 +427,7 @@ if __name__ == "__main__":
 
 # https://trac.ffmpeg.org/wiki/Encode/VP8
 # https://trac.ffmpeg.org/wiki/Encode/H.264
+# https://blog.mediacru.sh/2013/12/23/The-right-way-to-encode-HTML5-video.html
 # constant quality mode is reccomended for libpvx
 # -q uses Variable bitrate, -l uses constant quality
 # This version of ffmpeg has nonfree parts compiled in. Therefore it is not
