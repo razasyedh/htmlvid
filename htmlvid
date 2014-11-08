@@ -77,6 +77,28 @@ def filesize(string):
         msg = "%s does not include a K or M suffix." % string
         raise configargparse.ArgumentTypeError(msg)
 
+def ffmpeg_options(string):
+    """Test that every option has an argument and is allowed."""
+    string = string.replace("\\", "")
+
+    words = string.split()
+    if len(words) % 2 != 0:
+        msg = "Every option doesn't have exactly one argument."
+        raise configargparse.ArgumentTypeError(msg)
+
+    # Check for options already used internally
+    option_list = []
+    for word in string.split(" "):
+        if word[0] == "-":
+            option_list.append(word)
+    blacklist = ["-ss", "-t", "-loglevel", "-threads", "-an", "-sn", "-vf"]
+    matches = set(option_list).intersection(blacklist)
+    if matches:
+        msg = "Option(s) %s used internally by htmlvid." % list(matches)
+        raise configargparse.ArgumentTypeError(msg)
+
+    return string
+
 def subtitle(string):
     """Test if our subtitle file exists."""
     if string == "0":
@@ -167,6 +189,9 @@ def get_args():
                              " subs.")
 
     group6 = parser.add_argument_group("Misc")
+    group6.add_argument("-O", "--options", metavar="opts", type=ffmpeg_options,
+                        help="Options to pass directly to FFmpeg. (Escape any"
+                             " dashes and quote spaces. ie: \\-foo 'bar baz')")
     group6.add_argument("-F", "--filters", metavar="filt",
                         help="Filters to pass to FFmpeg's '-vf' option"
                              " with commas separating them.")
@@ -383,6 +408,9 @@ def build_cmd(args):
     else:
         meta_filename = args.metadata
     cmd += " -metadata title='%s'" % meta_filename
+
+    if args.options is not None:
+        cmd += " %s" % args.options
 
     # Output File
     if args.output is None:
