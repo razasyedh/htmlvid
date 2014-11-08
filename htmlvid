@@ -69,11 +69,16 @@ def subtitle(string):
 def get_args():
     """Obtain the arguments entered for our program on the command line."""
     # Define all of our arguments and their help messages
+    description = ("htmlvid - A tool for creating HTML5 snippets of videos"
+                   " using FFmpeg.")
+    epilog = ("Example: `htmlvid -s 2:10 -t 5 video.mkv` creates a 5 second"
+              " snippet of video.mkv starting at 2 minutes and 10 seconds."
+              "Author: Syed Raza <github.com/razasyedh>")
     parser = configargparse.ArgumentParser(add_help=False, prog="htmlvid",
-                                           description="A tool to create html5"
-                                                       " snippets of videos.",
-                                           epilog="For additional help, see"
-                                                  " man %(prog)s")
+                                           default_config_files=["~/.htmlvid"],
+                                           add_config_file_help=False,
+                                           description=description,
+                                           epilog=epilog)
 
     group0 = parser.add_argument_group("Required Options")
     group0.add_argument("video", type=video_file,
