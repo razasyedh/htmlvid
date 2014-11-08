@@ -151,11 +151,10 @@ def get_args():
                         help="Copy whole video. (Incompatible with -s/-t)")
 
     group3 = parser.add_argument_group("Format Options")
-    group3.add_argument("-W", "--webm", action="store_true",
-                        help="Create a webM. (Default)")
-    group3.add_argument("-m", "--mp4", action="store_true",
-                        help="Create an MP4 instead of webM. Quality works on"
-                             " a different scale.")
+    group3.add_argument("-f", "--format", choices=["webm", "mp4"],
+                        default="webm",
+                        help="Whether to create a WebM or MP4. Quality works"
+                             " on a different scale for each. (Default: webm)")
     group3.add_argument("-S", "--sound", action="store_true",
                         help="Include sound.")
     group3.add_argument("-M", "--metadata", metavar="title",
@@ -202,8 +201,9 @@ def get_args():
         parser.print_help()
 
     args = parser.parse_args()
-    args = test_args(args)
-    args = get_duration(args)
+    test_conflicts(args)
+    set_implied(args)
+
 
     return args
 
@@ -215,20 +215,15 @@ def error_out(short_arg, long_arg, message):
     sys.stderr.write("htmlvid: error: %s" % error)
     sys.exit(1)
 
-def test_args(args):
-    """Test for missing, conflicting, or implying arguments."""
-    if (args.start is None or args.to is None) and not args.duplicate:
-        msg = "Start or end time missing."
-        error_out("s/-t", "start/--to", msg)
+def test_conflicts(args):
+    """Test that arguments aren't missing or conflicting with each other."""
+    if args.start is None and not args.duplicate:
+        msg = "Start time missing."
+        error_out("s", "start", msg)
 
-    if (args.bitrate is None or args.quality is None) and args.limit is None:
-        msg = "Bitrate or quality missing/"
-        error_out("b/-q", "bitrate/--quality", msg)
-
-    if args.mp4:
-        if args.webm:
-            msg = "Conflicting use with -W."
-            error_out("m", "mp4", msg)
+    if args.to is None and not args.duplicate:
+        msg = "End time missing."
+        error_out("t", "to", msg)
 
     if args.duplicate:
         if args.start is not None or args.to is not None:
@@ -240,29 +235,51 @@ def test_args(args):
             msg = "Conflicting use with -q/-b."
             error_out("l", "limit", msg)
 
-        if not args.twopass:
-            args.twopass = True
+    return
 
-    if args.testrun and args.verbose is None:
-        args.verbose = 2
+def set_implied(args):
+    """If an option used implies a value or another option, set it."""
+    if args.quality is None and args.limit is None:
+        if args.format == "webm":
+            args.quality = 10
+        else:
+            args.quality = 23
 
-    return args
+    if args.format == "webm":
+        if args.bitrate is None and args.limit is None:
+            args.bitrate = "750K"
 
-def get_duration(args):
-    """Get the duration in the case of a timestamp or duplication."""
-    # If duration is a timestamp, convert to seconds
-    if not args.duplicate:
-        semicolons = args.to.count(":")
-        if semicolons > 0:
-            args.to = calculate_duration(args)
+    if args.limit is not None:
+        args.twopass = True
 
-    # If copying with a size limit, get video duration
+    if args.testrun and (args.verbose is None or args.verbose == 2):
+        args.verbose = 1
+
+    if args.metadata is None:
+        # Get filename without an extension
+        fname = os.path.basename(args.video)
+        args.metadata = os.path.splitext(fname)[0]
+
+    # If copying, get full video duration
     if args.duplicate:
-        if args.limit is not None:
-            args.to = get_full_duration(FFPROBE_BIN, args.video)
+        args.to = get_full_duration(args.video)
+    else:
+        # If duration is a timestamp, convert to seconds
+        if args.to.count(":") > 0:
+            args.to = calculate_duration(args.start, args.to)
 
+    # If no filename specified, generate one
+    if args.output is None:
+        unix_time = str(int(time.time()))
+        start_time = args.start.replace(":", "_")
+        time_info = "%s+%ss" % (start_time, args.to)
+        args.output = "%s_%s.%s" % (unix_time, time_info, args.format)
+    # If filename has no extension, append
+    else:
+        if args.output[-4:] not in ["webm", ".mp4"]:
+            args.output += ".%s" % args.format
 
-    return args
+    return
 
 def get_filters(args):
     """Chain filters together to make the -vf part of our FFmpeg command."""
@@ -382,14 +399,6 @@ def build_cmd(args):
     if not args.duplicate:
         cmd += " -t %s" % args.to
 
-    if args.mp4:
-        codec = "libx264"
-        extension = ".mp4"
-    else:
-        codec = "libvpx"
-        extension = ".webm"
-    cmd += " -c:v %s" % codec
-
     if args.limit is None:
         # Constant quality mode
         cmd += " -crf %s" % args.quality
@@ -418,22 +427,13 @@ def build_cmd(args):
     if args.twopass:
         cmd += " -pass 1"
 
-    if args.metadata is None:
-        meta_filename = os.path.basename(args.video)
-        meta_filename = meta_filename[:-4]
-    else:
-        meta_filename = args.metadata
-    cmd += " -metadata title='%s'" % meta_filename
+    cmd += " -metadata title='%s'" % args.metadata
 
     if args.options is not None:
         cmd += " %s" % args.options
 
     # Output File
-    if args.output is None:
-        filename = str(int(time.time())) + extension
-    else:
-        filename = args.output
-    cmd += " '%s'" % filename
+    cmd += " '%s'" % args.output
 
     return cmd
 
