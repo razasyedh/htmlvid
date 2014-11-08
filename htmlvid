@@ -473,36 +473,78 @@ def build_cmd(args):
 
     return cmd
 
-def get_temp_dir():
-    """Create a temporary directory to store our video and ffmpeg logs."""
-    temp_folder = tempfile.gettempdir()
-    temp_dir = temp_folder + os.sep + "htmlvid"
-    if not os.path.exists(temp_dir):
-        os.makedirs(temp_dir)
+def print_progress(log_path, duration):
+    """Show the progress of our FFmpeg command."""
 
-    return temp_dir
+    # Read the logfile and get the last line
+    try:
+        log_file = open(log_path, "r")
+    except IOError:
+        return
 
-def run_cmd(cmd):
-    """Takes the ffmpeg command and runs it."""
+    lines = log_file.readlines()
 
-    cmd_list = shlex.split(cmd)
+    try:
+        last_line = lines[-2]
+    except IndexError:
+        return
+
+    log_file.close()
+
+    # Find out the current time FFmpeg is at
+    # Expected input:
+    # "[...] s_size=      nnnkB time= s.xxx br=  nnnn.nkbits/s [...]"
+    time_beginning = last_line.find("time=")
+    time_end = last_line.find("br=")
+    current_time = last_line[time_beginning+6:time_end]
+
+    duration = float(duration)
+    current_time = float(current_time)
+    percent = current_time / duration * 100
+
+    print "\rProgress: %.0f%% (%.3f/%.3fs)" % (percent, current_time, duration),
+    sys.stdout.flush() # Needed to show the output
+
+    return
+
+def run_cmd(command, duration, is_two_pass, verbosity):
+    """Take the FFmpeg command and run it."""
+
+    cmd_list = shlex.split(command)
 
     # Set up the folder and file paths
-    working_dir = os.getcwd()
-    temp_dir = get_temp_dir()
+    temp_dir = os.path.join(tempfile.gettempdir(), "htmlvid")
+    log_path = os.path.join(temp_dir, "log.txt")
     filename = cmd_list[-1]
     output_dir = os.path.dirname(filename)
     output_file = os.path.basename(filename)
-    filepath = temp_dir + os.sep + output_file
+    filepath = os.path.join(temp_dir, output_file)
 
-    # Find out if we're in the first pass of a twopass run
-    is_not_first_pass = False
-    if cmd.find("-pass 1") < 0:
-        is_not_first_pass = True
+    # Figure out which pass we are on
+    is_first_pass = False
+    if command.find("-pass 1") != -1:
+        is_first_pass = True
 
-    print temp_dir
-    print filename
+    # Delete and create temporary directory
+    if not is_two_pass or is_first_pass:
+        try:
+            shutil.rmtree(temp_dir)
+        except OSError:
+            pass
+        os.makedirs(temp_dir)
 
+    # Remove log file after first run so it doesn't mess up the progress
+    if is_two_pass and not is_first_pass:
+        os.remove(log_path)
+
+    # Print the temp folder and filename if we're verbose
+    if not is_two_pass or is_first_pass:
+        msg = "Platform: %s" % sys.platform
+        verbose_print(msg, verbosity)
+        msg = "Temp Folder: %s" % temp_dir
+        verbose_print(msg, verbosity)
+        msg = "Filename: %s\n" % filename
+        verbose_print(msg, verbosity)
 
     # Run the FFmpeg command in the temp directory
     ffmpeg_process = subprocess.Popen(cmd_list, cwd=temp_dir)
@@ -511,13 +553,21 @@ def run_cmd(cmd):
     exit_code = None
     while exit_code is None:
         exit_code = subprocess.Popen.poll(ffmpeg_process)
+
+        if verbosity in [None, 1] and not is_first_pass:
+            print_progress(log_path, duration)
+
+        time.sleep(1)
     if exit_code != 0:
         print "FFmpeg exited with a nonzero error code(%d)" % exit_code
         exit(1)
 
-    # Move the video to our destination
-    if is_not_first_pass and output_dir == "":
-        shutil.move(filepath, working_dir)
+    if verbosity != 2 and not is_first_pass:
+        print "\rProgress: Finished                    "
+
+    # Move the video to the working directory if nothing was specified with -o
+    if not is_first_pass and output_dir == "":
+        shutil.move(filepath, os.getcwd())
 
 def main():
     """Get options from the config file and the command line. Then use them to
@@ -528,11 +578,16 @@ def main():
 
     # Run the FFmpeg command if we're not testing and run twice if two passes
     if not args.testrun:
-        run_cmd(command)
+        if args.twopass:
+            print "Running Pass 1"
+
+        run_cmd(command, args.to, args.twopass, args.verbose)
+
         if args.twopass:
             command2 = command.replace("-pass 1", "-pass 2")
             print "Running pass 2"
-            run_cmd(command2)
+
+            run_cmd(command2, args.to, args.twopass, args.verbose)
 
     sys.exit(0)
 
