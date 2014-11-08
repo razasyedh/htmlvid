@@ -276,13 +276,19 @@ def get_filters(args):
         else:
             # For mp4 we have to make sure our new dimensions are even numbers
             width_filter = "scale=min(%s\\,iw):trunc(ow/a/2)*2" % args.width
+
+    # Generate our filtergraph
+    filter_list = [width_filter, args.embed, args.filters]
+    filter_graph = ""
+
+    for filters in filter_list:
         if filters is not None:
-            filter_cmd = filter_cmd + filters + ","
+            filter_graph = filter_graph + filters + ","
 
     # Remove trailing comma
-    filter_cmd = filter_cmd[:-1]
+    filter_graph = filter_graph[:-1]
 
-    return filter_cmd
+    return filter_graph
 
 def timestamp_to_ms(timestamp):
     """Break up a timestamp and convert it to milliseconds."""
