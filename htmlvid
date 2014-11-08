@@ -2,7 +2,7 @@
 
 # Convert dict back to Namespace????
 
-"""htmlgif
+"""htmlvid
 
 A tool to create html5 snippets of videos.
 
@@ -68,7 +68,7 @@ def subtitle(string):
 def get_args():
     """Obtain the arguments entered for our program on the command line."""
     # Define all of our arguments and their help messages
-    parser = configargparse.ArgumentParser(add_help=False, prog="htmlgif",
+    parser = configargparse.ArgumentParser(add_help=False, prog="htmlvid",
                                            description="A tool to create html5"
                                                        " snippets of videos.",
                                            epilog="For additional help, see"
