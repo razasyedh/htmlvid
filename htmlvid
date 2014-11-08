@@ -340,6 +340,13 @@ def build_cmd(args):
     if not args.sound:
         cmd += " -an"
 
+    if args.metadata is None:
+        meta_filename = os.path.basename(args.video)
+        meta_filename = meta_filename[:-4]
+    else:
+        meta_filename = args.metadata
+    cmd += " -metadata title='%s'" % meta_filename
+
     # Output File
     if args.output is None:
         filename = str(int(time.time())) + extension
