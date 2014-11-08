@@ -46,6 +46,18 @@ def time_stamp(string):
 
     return string
 
+def duration(string):
+    """Test if the input is a timestamp or a duration.
+
+    If it is a timestamp, pass it to time_stamp() to properly format it, or
+    else just return the duration.
+    """
+    semicolon_count = string.count(":")
+    if semicolon_count > 0:
+        string = time_stamp(string)
+
+    return string
+
 def crf(string):
     """Test that the quality number is within the proper range."""
     quality = int(string)
@@ -113,7 +125,7 @@ def get_args():
     group2 = parser.add_argument_group("Time Options",)
     group2.add_argument("-s", "--start", metavar="time", type=time_stamp,
                         help="Time to start at in hh:mm:ss[.xxx] format.")
-    group2.add_argument("-t", "--to", metavar="dur", type=time_stamp,
+    group2.add_argument("-t", "--to", metavar="dur", type=duration,
                         help="The duration in seconds and milliseconds. A"
                              " timestamp can also be used.")
     group2.add_argument("-D", "--duplicate", action="store_true",
