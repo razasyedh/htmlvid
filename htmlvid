@@ -325,33 +325,35 @@ def timestamp_to_ms(timestamp):
 
     return millisec
 
-def calculate_duration(args):
-    """Calculate the duration of our video if the -t arg is a timestamp."""
-    # Calculate the difference between the two timestamps converted to ms
-    beginning = timestamp_to_ms(args.start)
-    end = timestamp_to_ms(args.to)
+def calculate_duration(start, end):
+    """Calculate the difference between two timestamps converted to ms."""
+    start_ms = timestamp_to_ms(start)
+    end_ms = timestamp_to_ms(end)
 
-    difference_ms = end - beginning
-    difference_s = float(difference_ms) / 1000
+    difference_ms = float(end_ms - start_ms)
+    difference_s = str(difference_ms / 1000)
 
-    return str(difference_s)
+    # Remove trailing decimal zero
+    if difference_s.split(".")[1] == "0":
+        difference_s = difference_s[:-2]
+
+    return difference_s
 
 def calculate_bitrate(limit, duration):
     """Calculate the optimal bitrate for our size limit."""
+    vid_duration = float(duration)
     size_limit = float(limit[:-1])
     # Convert megabyte to kilobyte
     if limit.endswith("M"):
         size_limit *= 1024
 
-    vid_duration = float(duration)
+    bitrate = size_limit / vid_duration * 8
+    bitrate = str(round(bitrate, 2)) + "K"
+    return bitrate
 
-    new_limit = size_limit / vid_duration * 8
-    new_limit = str(round(new_limit, 2)) + "K"
-    return new_limit
-
-def get_full_duration(ffprobe, video_path):
+def get_full_duration(video_path):
     """Run a command to get the duration of our input video."""
-    cmd = "%s -i '%s'" % (ffprobe, video_path)
+    cmd = "%s -i '%s'" % (FFPROBE_BIN, video_path)
     cmd += " -loglevel error -show_entries format=duration"
     cmd_list = shlex.split(cmd)
 
