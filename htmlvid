@@ -171,35 +171,35 @@ def get_args():
 
     # Get arguments and print a friendly error for missing files
     try:
-        args = vars(parser.parse_args())
+        args = parser.parse_args()
     except IOError:
         print "error: positional argument video: file does not exist."
         sys.exit(1)
 
     # Check for conflicting options
-    if args["mp4"]:
-        if args["webm"]:
+    if args.mp4:
+        if args.webm:
             msg = "Conflicting use with -W."
             error_out("m", "mp4", msg)
 
-    if args["duplicate"]:
-        if args["start"] is not None or args["to"] is not None:
+    if args.duplicate:
+        if args.start is not None or args.to is not None:
             msg = "Conflicting use with -s/-t."
             error_out("D", "duplicate", msg)
 
-    if args["limit"] is not None:
-        if args["quality"] is not None or args["bitrate"] is not None:
+    if args.limit is not None:
+        if args.quality is not None or args.bitrate is not None:
             msg = "Conflicting use with -q/-b."
             error_out("l", "limit", msg)
 
-        if not args["twopass"]:
-            args["twopass"] = True
+        if not args.twopass:
+            args.twopass = True
 
     return args
 
 def get_filters(args):
     """Chain together filters for the -vf portion of our command"""
-    filterlist = [args["width"], args["embed"], args["filters"]]
+    filterlist = [args.width, args.embed, args.filters]
     filter_cmd = ""
 
     for filters in filterlist:
@@ -226,18 +226,14 @@ def timestamp_to_ms(timestamp):
 
 def calculate_duration(args):
     """Calculate the duration of our video if the -t arg is a timestamp"""
-    semicolons = args["to"].count(":")
-    if semicolons > 0:
-        # Calculate the difference between the two timestamps converted to ms
-        beginning = timestamp_to_ms(args["start"])
-        end = timestamp_to_ms(args["to"])
+    # Calculate the difference between the two timestamps converted to ms
+    beginning = timestamp_to_ms(args.start)
+    end = timestamp_to_ms(args.to)
 
-        difference_ms = end - beginning
-        difference_s = float(difference_ms) / 1000
+    difference_ms = end - beginning
+    difference_s = float(difference_ms) / 1000
 
-        return difference_s
-    else:
-        return float(args["to"])
+    return str(difference_s)
 
 def get_full_duration(ffprobe, video_path):
     """Run a command to get the duration of our input video"""
@@ -271,11 +267,6 @@ def build_cmd(args):
     """Build our ffmpeg command from our arguments"""
     cmd = ""
 
-# DELETE LATER?
-    if (args["start"] is None or args["to"] is None) and not args["duplicate"]:
-        msg = "Start or end time missing. Aborting."
-        error_out("s/-t", "start/--to", msg)
-
     if os.name == "nt":
         ffmpeg_bin = "ffmpeg.exe"
         ffprobe_bin = "ffprobe.exe"
@@ -289,32 +280,32 @@ def build_cmd(args):
     cmd += " -hide_banner"
 
     # Set the proper verbosity for ffmpeg. Default only shows errors.
-    if args["verbose"] is None:
+    if args.verbose is None:
         verbosity = "error"
     else:
         verbosity = "info"
     cmd += " -loglevel %s" % verbosity
 
-    seek_cmd = " -ss %s" % args["start"]
-    input_cmd = " -i '%s'" % args["video"]
-    if args["embed"] is None:
+    seek_cmd = " -ss %s" % args.start
+    input_cmd = " -i '%s'" % args.video
+    if args.embed is None:
         # fast seek if not embedding subs
         cmd = cmd + seek_cmd + input_cmd
     else:
         cmd = cmd + input_cmd + seek_cmd
 
     # If copying, get video duration
-    if args["duplicate"]:
-        args["to"] = get_full_duration(ffprobe_bin, args["video"])
+    if args.duplicate:
+        args.to = get_full_duration(ffprobe_bin, args.video)
 
-    # If duration is a timestamp, stop at that position, else stop at duration
-    semicolons = args["to"].count(":")
+    # If duration is a timestamp, convert to a duration
+    semicolons = args.to.count(":")
     if semicolons > 0:
         cmd += " -to %s" % args["to"]
     else:
         cmd += " -t %s" % args["to"]
 
-    if args["mp4"]:
+    if args.mp4:
         codec = "libx264"
         extension = ".mp4"
     else:
@@ -322,9 +313,9 @@ def build_cmd(args):
         extension = ".webm"
     cmd += " -c:v %s" % codec
 
-    if args["limit"] is None:
-        cmd += " -crf %s" % args["quality"]
-        cmd += " -b:v %s" % args["bitrate"]
+    if args.limit is None:
+        cmd += " -crf %s" % args.quality
+        cmd += " -b:v %s" % args.bitrate
     else:
         bitrate = calculate_bitrate(args)
         # cmd += " -crf 0"
@@ -335,14 +326,14 @@ def build_cmd(args):
         cmd += " -vf %s" % filters
 
     # Exclude sound
-    if not args["sound"]:
+    if not args.sound:
         cmd += " -an"
 
     # Output File
-    if args["output"] is None:
+    if args.output is None:
         filename = str(int(time.time())) + extension
     else:
-        filename = args["output"]
+        filename = args.output
     cmd += " '%s'" % filename
 
     print cmd
@@ -359,13 +350,13 @@ def main():
     """
     arguments = get_args()
 
-    # for key in arguments:
+    # for key in var(arguments):
     #     print key, ":", arguments[key]
     # print "\n\n"
 
     command = build_cmd(arguments)
 
-    if arguments["twopass"]:
+    if arguments.twopass:
         passes = 2
     else:
         passes = 1
