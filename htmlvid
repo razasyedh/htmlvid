@@ -11,10 +11,10 @@ running the program with the '-h' option.
 """
 
 import sys
-# import subprocess
 import os
 import time
 import configargparse
+import subprocess
 
 def error_out(short_arg, long_arg, message):
     """Print an error to stderr and exit. Needed because configargparse
@@ -337,6 +337,7 @@ def build_cmd(args):
     # Exclude sound
     if not args["sound"]:
         cmd += " -an"
+
     # Output File
     if args["output"] is None:
         filename = str(int(time.time())) + extension
@@ -346,6 +347,11 @@ def build_cmd(args):
 
     print cmd
     return cmd
+
+def run_cmd(cmd, passes):
+    """Takes the ffmpeg command list and runs it"""
+    cmd_list = cmd.split()
+    exit_code = subprocess.call(cmd_list)
 
 def main():
     """Get options from config file and the command line. Then use them to
@@ -359,9 +365,12 @@ def main():
 
     command = build_cmd(arguments)
 
+    if arguments["twopass"]:
+        passes = 2
+    else:
+        passes = 1
 
-if __name__ == "__main__":
-    main()
+    run_cmd(command, passes)
 
 
 
@@ -371,6 +380,8 @@ if __name__ == "__main__":
     main()
 
 
+# reconsider timestamp format since you can convert everything to seconds
+# anyway or prepend the zeroes.
 
 # try variable bitrate only for -l (-b:v) and leave out the -crf
 # B:V (max bitrate for crf) might have no effect for mp4's. test it out, might
@@ -390,7 +401,3 @@ if __name__ == "__main__":
 # -q uses Variable bitrate, -l uses constant quality
 # This version of ffmpeg has nonfree parts compiled in. Therefore it is not
 # legally redistributable.
-
-# -vv to make htmlgif verbose along with ffmpeg
-# -o to name output
-
