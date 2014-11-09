@@ -235,6 +235,20 @@ def calculate_duration(args):
 
     return str(difference_s)
 
+def calculate_bitrate(args):
+    """Calculate the optimal bitrate for our size limit"""
+    limit = args.limit
+    size_limit = float(limit[:-1])
+    # Convert megabyte to kilobyte
+    if limit.endswith("M"):
+        size_limit *= 1024
+
+    vid_duration = float(args.to)
+
+    new_limit = size_limit / vid_duration * 8
+    new_limit = str(round(new_limit, 2)) + "K"
+    return new_limit
+
 def get_full_duration(ffprobe, video_path):
     """Run a command to get the duration of our input video"""
     cmd = "%s -i %s" % (ffprobe, video_path)
@@ -248,20 +262,6 @@ def get_full_duration(ffprobe, video_path):
     metadata_duration = duration_line.split("=")[1]
 
     return metadata_duration
-
-def calculate_bitrate(args):
-    """Calcuulate the optimal bitrate for our size limit"""
-    limit = args["limit"]
-    size_limit = float(limit[:-1])
-    # Convert megabyte to kilobyte
-    if limit.endswith("M"):
-        size_limit *= 1024
-
-    vid_duration = calculate_duration(args)
-
-    new_limit = size_limit / vid_duration * 8
-    new_limit = str(round(new_limit, 2)) + "K"
-    return new_limit
 
 def build_cmd(args):
     """Build our ffmpeg command from our arguments"""
@@ -301,9 +301,8 @@ def build_cmd(args):
     # If duration is a timestamp, convert to a duration
     semicolons = args.to.count(":")
     if semicolons > 0:
-        cmd += " -to %s" % args["to"]
-    else:
-        cmd += " -t %s" % args["to"]
+        args.to = calculate_duration(args)
+    cmd += " -t %s" % args.to
 
     if args.mp4:
         codec = "libx264"
