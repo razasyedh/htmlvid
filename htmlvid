@@ -197,6 +197,20 @@ def get_args():
 
     return args
 
+def get_filters(args):
+    """Chain together filters for the -vf portion of our command"""
+    filterlist = [args["width"], args["embed"], args["filters"]]
+    filter_cmd = ""
+
+    for filters in filterlist:
+        if filters is not None:
+            filter_cmd = filter_cmd + ","
+
+    # Remove trailing comma
+    filter_cmd = filter_cmd[:-1]
+
+    return filter_cmd
+
 def timestamp_to_ms(timestamp):
     """Break up a timestamp and convert it to milliseconds"""
     # "hh" : "mm" : "ss.xxx"
@@ -315,6 +329,11 @@ def build_cmd(args):
         bitrate = calculate_bitrate(args)
         # cmd += " -crf 0"
         cmd += " -b:v %s" % bitrate
+
+    filters = get_filters(args)
+    if filters != "":
+        cmd += " -vf %s" % filters
+
     # Exclude sound
     if not args["sound"]:
         cmd += " -an"
