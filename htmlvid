@@ -12,6 +12,8 @@ running the program with the '-h' option.
 
 import sys
 # import subprocess
+import os
+import time
 import configargparse
 
 def error_out(short_arg, long_arg, message):
@@ -195,27 +197,92 @@ def get_args():
 
     return args
 
+def build_cmd(args):
+    """Build our ffmpeg command from our arguments"""
+    cmd = ""
+
+# DELETE LATER?
+    if (args["start"] is None or args["to"] is None) and not args["duplicate"]:
+        msg = "Start or end time missing. Aborting."
+        error_out("s/-t", "start/--to", msg)
+
+    if os.name == "nt":
+        ffmpeg_bin = "ffmpeg.exe"
+        ffprobe_bin = "ffprobe.exe"
+    else:
+        ffmpeg_bin = "ffmpeg"
+        ffprobe_bin = "ffprobe"
+    cmd += ffmpeg_bin
+
+    cmd += " -y"
+    cmd += " -threads 0"
+    cmd += " -hide_banner"
+
+    # Set the proper verbosity for ffmpeg. Default only shows errors.
+    if args["verbose"] is None:
+        verbosity = "error"
+    else:
+        verbosity = "info"
+    cmd += " -loglevel %s" % verbosity
+
+    seek_cmd = " -ss %s" % args["start"]
+    input_cmd = " -i '%s'" % args["video"]
+    if args["embed"] is None:
+        # fast seek if not embedding subs
+        cmd = cmd + seek_cmd + input_cmd
+    else:
+        cmd = cmd + input_cmd + seek_cmd
+
+    # If duration is a timestamp, stop at that position, else stop at duration
+    semicolons = args["to"].count(":")
+    if semicolons > 0:
+        cmd += " -to %s" % args["to"]
+    else:
+        cmd += " -t %s" % args["to"]
+
+    if args["mp4"]:
+        codec = "libx264"
+        extension = ".mp4"
+    else:
+        codec = "libvpx"
+        extension = ".webm"
+    cmd += " -c:v %s" % codec
+    # Exclude sound
+    if not args["sound"]:
+        cmd += " -an"
+    # Output File
+    if args["output"] is None:
+        filename = str(int(time.time())) + extension
+    else:
+        filename = args["output"]
+    cmd += " '%s'" % filename
+
+    print cmd
+    return cmd
 
 def main():
     """Get options from config file and the command line. Then use them to
     create and execute our ffmpeg command.
     """
-    args = get_args()
+    arguments = get_args()
 
-    for key in args:
-        print key, ":", args[key]
+    # for key in arguments:
+    #     print key, ":", arguments[key]
+    # print "\n\n"
 
-    sys.exit(0)
+    command = build_cmd(arguments)
 
 
 if __name__ == "__main__":
     main()
 
 
-# pass the config arguments as a dictionary to argparse
 
+    sys.exit(0)
 
-# make sure to set the proper loglevel for ffmpeg
+if __name__ == "__main__":
+    main()
+
 
 
 # try variable bitrate only for -l (-b:v) and leave out the -crf
