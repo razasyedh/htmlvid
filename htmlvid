@@ -104,7 +104,8 @@ def get_args():
     group1.add_argument("-o", "--output", metavar="name",
                         help="The output filename. If omitted, a unix"
                              " timestamp is used.")
-    group1.add_argument("-c", "--config", metavar="file", #is_config_file=True,
+#CONFIGGGGG
+    group1.add_argument("-c", "--config", metavar="file", is_config_file=True,
                         help="The path to a custom config file.")
     group1.add_argument("-v", "--verbose", action="count",
                         help="Use once to show ffmpeg output and twice to make"
