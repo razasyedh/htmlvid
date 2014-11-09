@@ -178,6 +178,14 @@ def get_args():
         print "error: positional argument video: file does not exist."
         sys.exit(1)
 
+    if (args.start is None or args.to is None) and not args.duplicate:
+        msg = "Start or end time missing."
+        error_out("s/-t", "start/--to", msg)
+
+    if (args.bitrate is None or args.quality is None) and args.limit is None:
+        msg = "Bitrate and quality missing"
+        error_out("b/-q", "bitrate/--quality", msg)
+
     # Check for conflicting options
     if args.mp4:
         if args.webm:
