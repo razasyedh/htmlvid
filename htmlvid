@@ -122,9 +122,8 @@ def get_args():
 
     group2 = parser.add_argument_group("Time Options",)
     group2.add_argument("-s", "--start", metavar="time", type=time_stamp,
-                        help="Time to start at in hh:mm:ss[.xxx] format."
-                             " (Only milliseconds are optional)")
-    group2.add_argument("-t", "--to", metavar="dur", type=duration,
+                        help="Time to start at in hh:mm:ss[.xxx] format.")
+    group2.add_argument("-t", "--to", metavar="dur", type=time_stamp,
                         help="The duration in seconds and milliseconds. A"
                              " timestamp can also be used.")
     group2.add_argument("-D", "--duplicate", action="store_true",
@@ -143,7 +142,7 @@ def get_args():
                                        " size limit, else -q with -b")
     group4.add_argument("-q", "--quality", metavar="crf", type=crf,
                         help="Quality threshold. Lower is better. Defaults:"
-                             " 10 for webm (4-63) and 23 for mp4 (0-51).")
+                             " 10 for webM (4-63) and 23 for MP4 (0-51).")
     group4.add_argument("-b", "--bitrate", metavar="rate", type=filesize,
                         help="Bitrate to use. Must include K or M suffix."
                              " (Default: 750K)")
@@ -160,8 +159,8 @@ def get_args():
                              " scaling. (Default: 640)")
     group5.add_argument("-e", "--embed", metavar="subs", type=subtitle,
                         help="Embed subtitles. Enter 0 to use internal subs.")
-    group5.add_argument("-F", "--filters", metavar="string",
-                        help="Extra filters to pass to ffmpeg's -vf option"
+    group5.add_argument("-F", "--filters", metavar="filt",
+                        help="Filters to pass to ffmpeg's -vf option"
                              " with commas separating them.")
 
 
