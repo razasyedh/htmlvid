@@ -197,6 +197,47 @@ def get_args():
 
     return args
 
+def timestamp_to_ms(timestamp):
+    """Break up a timestamp and convert it to milliseconds"""
+    # "hh" : "mm" : "ss.xxx"
+    hms = timestamp.split(":")
+    # Convert seconds and milliseconds to a list
+    hms[2] = hms[2].split(".")
+    # If there aren't any milliseconds
+    if len(hms[2]) != 2:
+        hms[2][1] = 0
+
+    millisec = (hms[0] * 3600 + hms[1] * 60 + hms[2][0]) * 1000 + hms[2][1]
+    return millisec
+
+def calculate_duration(args):
+    """Calculate the duration of our video if the -t arg is a timestamp"""
+    semicolons = args["to"].count(":")
+    if semicolons > 0:
+        # Calculate the difference between the two timestamps converted to ms
+        beginning = timestamp_to_ms(args["start"])
+        end = timestamp_to_ms(args["to"])
+
+        difference_ms = end - beginning
+        difference_s = float(difference_ms) / 1000
+
+        return difference_s
+    else:
+        return float(args["to"])
+def calculate_bitrate(args):
+    """Calcuulate the optimal bitrate for our size limit"""
+    limit = args["limit"]
+    size_limit = float(limit[:-1])
+    # Convert megabyte to kilobyte
+    if limit.endswith("M"):
+        size_limit *= 1024
+
+    vid_duration = calculate_duration(args)
+
+    new_limit = size_limit / vid_duration * 8
+    new_limit = str(round(new_limit, 2)) + "K"
+    return new_limit
+
 def build_cmd(args):
     """Build our ffmpeg command from our arguments"""
     cmd = ""
@@ -247,6 +288,14 @@ def build_cmd(args):
         codec = "libvpx"
         extension = ".webm"
     cmd += " -c:v %s" % codec
+
+    if args["limit"] is None:
+        cmd += " -crf %s" % args["quality"]
+        cmd += " -b:v %s" % args["bitrate"]
+    else:
+        bitrate = calculate_bitrate(args)
+        # cmd += " -crf 0"
+        cmd += " -b:v %s" % bitrate
     # Exclude sound
     if not args["sound"]:
         cmd += " -an"
