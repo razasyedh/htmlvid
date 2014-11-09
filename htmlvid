@@ -264,10 +264,11 @@ def calculate_bitrate(args):
     return new_limit
 
 def get_full_duration(ffprobe, video_path):
-    """Run a command to get the duration of our input video"""
-    cmd = "%s -i %s" % (ffprobe, video_path)
-    cmd += "-loglevel error -show_entries format=duration"
     cmd_list = cmd.split()
+    """Run a command to get the duration of our input video."""
+    cmd = "%s -i '%s'" % (ffprobe, video_path)
+    cmd += " -loglevel error -show_entries format=duration"
+    print "Command to get video duration: ", cmd
 
     metadata = subprocess.check_output(cmd_list)
     # [FORMAT]\nduration=s.xxxxx\n[/FORMAT]\n
