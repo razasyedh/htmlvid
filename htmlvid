@@ -76,6 +76,18 @@ def filesize(string):
         msg = "%r does not include a K or M suffix." % string
         error_out("b/-l", "bitrate/--limit", msg)
 
+def subtitle(string):
+    """Test if our subtitle file exists."""
+    if string == "0":
+        return string
+    else:
+        exists = os.path.isfile(string)
+        if exists:
+            return string
+        else:
+            msg = "%r not found." % string
+            error_out("e", "embed", msg)
+
 def get_args():
     """Obtain the arguments entered for our program on the command line."""
     # Define all of our arguments and their help messages
@@ -135,7 +147,8 @@ def get_args():
     group5.add_argument("-w", "--width", metavar="num", type=int,
                         help="The width of the output file. Enter 0 for no"
                              " scaling. (Default: 640)")
-
+    group5.add_argument("-e", "--embed", metavar="subs", type=subtitle,
+                        help="Embed subtitles. Enter 0 to use internal subs.")
 
 
     # Display a help message if the program is run without arguments
