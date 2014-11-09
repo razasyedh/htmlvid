@@ -12,6 +12,10 @@ import sys
 # import subprocess
 import configargparse
 
+def error_out(short_arg, long_arg, message):
+    """Print an error to stderr and exit. Needed because configargparse
+    doesn't support ArgumentTypeError.
+    """
 
 def get_args():
     """Obtain the arguments entered for our program on the command line."""
@@ -22,6 +26,9 @@ def get_args():
         length = len(string)
         if length < 8 or length > 12:
             error = True
+    sys.stderr.write("error: argument -%s/--%s: %s\n" % (short_arg,
+                                                         long_arg, message))
+    sys.exit(1)
 
         semicolon_count = string.count(":")
         if semicolon_count != 2:
@@ -119,35 +126,31 @@ def get_args():
 
     # Get arguments and print a friendly error for missing files
     try:
-        arguments = vars(parser.parse_args())
+        args = vars(parser.parse_args())
     except IOError:
         print "error: positional argument video: file does not exist."
         sys.exit(1)
 
-
     # Check for conflicting options
-    if arguments["mp4"]:
-        if arguments["webm"]:
-            print "error: argument -m/--mp4: Conflicting use with -W."
-            sys.exit(1)
+    if args["mp4"]:
+        if args["webm"]:
+            msg = "Conflicting use with -W."
+            error_out("m", "mp4", msg)
 
-    if arguments["copy"]:
-        if arguments["start"] is not None or arguments["to"] is not None:
-            print "error: argument -C/--copy: Conflicting use with -s/-t."
-            sys.exit(1)
+    if args["duplicate"]:
+        if args["start"] is not None or args["to"] is not None:
+            msg = "Conflicting use with -s/-t."
+            error_out("D", "duplicate", msg)
 
-    if arguments["limit"] is not None:
-        if arguments["quality"] is not None or arguments["bitrate"] is not None:
-            print "error: argument -l/--limit: Conflicting use with -q/-b."
-            sys.exit(1)
+    if args["limit"] is not None:
+        if args["quality"] is not None or args["bitrate"] is not None:
+            msg = "Conflicting use with -q/-b."
+            error_out("l", "limit", msg)
 
-        if not arguments["twopass"]:
-            arguments["twopass"] = True
+        if not args["twopass"]:
+            args["twopass"] = True
 
-
-    return arguments
-
-
+    return args
 
 
 def main():
