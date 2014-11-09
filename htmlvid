@@ -35,24 +35,8 @@ def time_stamp(string):
         msg = "%r is not in the hh:mm:ss[.xxx] format." % string
         error_out("s", "start", msg)
 
-def duration(string):
-    """Test that our duration conforms to the proper format."""
-    error = False
-
-    length = len(string)
-    if length > 12:
-        error = True
-
     semicolon_count = string.count(":")
-    if semicolon_count > 0:
-        if semicolon_count != 2:
-            error = True
 
-    if not error:
-        return string
-    else:
-        msg = "%r is not in the hh:mm:ss[.xxx] format." % string
-        error_out("s", "start", msg)
 
 def crf(string):
     """Test that the quality number is within our range."""
@@ -164,6 +148,8 @@ def get_args():
 
     args = parser.parse_args()
     args = test_args(args)
+    args = get_duration(args)
+
     return args
 
 def error_out(short_arg, long_arg, message):
@@ -206,6 +192,25 @@ def test_args(args):
         args.verbose = 2
 
     return args
+
+def get_duration(args):
+    """Get the duration in the case of a timestamp or duplication."""
+    # If duration is a timestamp, convert to seconds
+    if not args.duplicate:
+        semicolons = args.to.count(":")
+        if semicolons > 0:
+            args.to = calculate_duration(args)
+
+    # If copying with a size limit, get video duration
+    if args.duplicate:
+        if args.limit is not None:
+            args.to = get_full_duration(FFPROBE_BIN, args.video)
+
+    if float(args.to) > 300:
+        msg = " Output video longer than 5 minutes. You should probably be"
+        msg += " using ffmpeg directly at this point."
+        sys.stderr.write("htmlvid: warning: %s\n" % msg)
+
     return args
 
 def get_filters(args):
