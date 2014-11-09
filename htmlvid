@@ -16,14 +16,6 @@ import time
 import configargparse
 import subprocess
 
-def error_out(short_arg, long_arg, message):
-    """Print an error to stderr and exit. Needed because configargparse
-    doesn't support ArgumentTypeError.
-    """
-
-    sys.stderr.write("error: argument -%s/--%s: %s\n" % (short_arg,
-                                                         long_arg, message))
-    sys.exit(1)
 
 def time_stamp(string):
     """Test that our timestamp conforms to the proper format."""
@@ -69,7 +61,7 @@ def crf(string):
         return quality
     else:
         msg = "%r is out of the quality range. (0-63)" % string
-        error_out("q", "quality", msg)
+        raise configargparse.ArgumentTypeError(msg)
 
 def filesize(string):
     """Test if the filesize argument has a proper suffix."""
@@ -79,7 +71,7 @@ def filesize(string):
         return number + suffix
     else:
         msg = "%r does not include a K or M suffix." % string
-        error_out("b/-l", "bitrate/--limit", msg)
+        raise configargparse.ArgumentTypeError(msg)
 
 def subtitle(string):
     """Test if our subtitle file exists."""
@@ -91,7 +83,7 @@ def subtitle(string):
             return string
         else:
             msg = "%r not found." % string
-            error_out("e", "embed", msg)
+            raise configargparse.ArgumentTypeError(msg)
 
 def get_args():
     """Obtain the arguments entered for our program on the command line."""
@@ -175,6 +167,13 @@ def get_args():
     except IOError:
         print "error: positional argument video: file does not exist."
         sys.exit(1)
+def error_out(short_arg, long_arg, message):
+    """Print an error to stderr with the relevant arguments and exit."""
+
+    sys.stderr.write("htmlvid: error: argument -%s/--%s: %s\n" % (short_arg,
+                                                                  long_arg,
+                                                                  message))
+    sys.exit(1)
 
     if (args.start is None or args.to is None) and not args.duplicate:
         msg = "Start or end time missing."
