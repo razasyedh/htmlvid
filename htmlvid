@@ -40,7 +40,24 @@ def time_stamp(string):
         msg = "%r is not in the hh:mm:ss[.xxx] format." % string
         error_out("s", "start", msg)
 
+def duration(string):
+    """Test that our duration conforms to the proper format."""
+    error = False
 
+    length = len(string)
+    if length > 12:
+        error = True
+
+    semicolon_count = string.count(":")
+    if semicolon_count > 0:
+        if semicolon_count != 2:
+            error = True
+
+    if not error:
+        return string
+    else:
+        msg = "%r is not in the hh:mm:ss[.xxx] format." % string
+        error_out("s", "start", msg)
 
 def crf(string):
     """Test that the quality number is within our range."""
@@ -84,8 +101,9 @@ def get_args():
     group2.add_argument("-s", "--start", metavar="time", type=time_stamp,
                         help="Time to start at in hh:mm:ss[.xxx] format."
                              " (Only milliseconds are optional)")
-    group2.add_argument("-t", "--to", metavar="dur",
-                        help="The duration in seconds and milliseconds.")
+    group2.add_argument("-t", "--to", metavar="dur", type=duration,
+                        help="The duration in seconds and milliseconds. A"
+                             " timestamp can also be used.")
     group2.add_argument("-D", "--duplicate", action="store_true",
                         help="Copy whole video. (Incompatible with -s/-t)")
 
