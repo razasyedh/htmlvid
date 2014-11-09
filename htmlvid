@@ -17,26 +17,16 @@ import configargparse
 import subprocess
 
 
-def time_stamp(string):
-    """Test that our timestamp conforms to the proper format."""
-    error = False
-
-    length = len(string)
-    if length < 8 or length > 12:
-        error = True
-
-    semicolon_count = string.count(":")
-    if semicolon_count != 2:
-        error = True
-
-    if not error:
         return string
     else:
-        msg = "%r is not in the hh:mm:ss[.xxx] format." % string
-        error_out("s", "start", msg)
 
+def time_stamp(string):
+    """Prepend hours to our timestamp if the user omitted them."""
     semicolon_count = string.count(":")
+    if semicolon_count == 1:
+        string = "00:" + string
 
+    return string
 
 def crf(string):
     """Test that the quality number is within our range."""
