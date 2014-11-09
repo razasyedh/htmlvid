@@ -162,12 +162,10 @@ def get_args():
         parser.print_help()
         sys.exit(1)
 
-    # Get arguments and print a friendly error for missing files
-    try:
-        args = parser.parse_args()
-    except IOError:
-        print "error: positional argument video: file does not exist."
-        sys.exit(1)
+    args = parser.parse_args()
+    args = test_args(args)
+    return args
+
 def error_out(short_arg, long_arg, message):
     """Print an error to stderr with the relevant arguments and exit."""
 
@@ -176,15 +174,16 @@ def error_out(short_arg, long_arg, message):
                                                                   message))
     sys.exit(1)
 
+def test_args(args):
+    """Test for missing, conflicting, or implying arguments."""
     if (args.start is None or args.to is None) and not args.duplicate:
         msg = "Start or end time missing."
         error_out("s/-t", "start/--to", msg)
 
     if (args.bitrate is None or args.quality is None) and args.limit is None:
-        msg = "Bitrate and quality missing"
+        msg = "Bitrate or quality missing/"
         error_out("b/-q", "bitrate/--quality", msg)
 
-    # Check for conflicting options
     if args.mp4:
         if args.webm:
             msg = "Conflicting use with -W."
@@ -203,6 +202,10 @@ def error_out(short_arg, long_arg, message):
         if not args.twopass:
             args.twopass = True
 
+    if args.testrun and args.verbose is None:
+        args.verbose = 2
+
+    return args
     return args
 
 def get_filters(args):
