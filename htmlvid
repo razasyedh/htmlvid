@@ -9,9 +9,8 @@ running the program with the '-h' option.
 """
 
 import sys
-import argparse
-import ConfigParser
 # import subprocess
+import configargparse
 
 
 def get_args():
@@ -55,9 +54,11 @@ def get_args():
 
 
     # Define all of our arguments and their help messages
-    parser = argparse.ArgumentParser(add_help=False,
-                                     description="A tool to create html5"
-                                                 " snippets of videos.")
+    parser = configargparse.ArgumentParser(add_help=False, prog="htmlgif",
+                                           description="A tool to create html5"
+                                                       " snippets of videos.",
+                                           epilog="For additional help, see"
+                                                  " man %(prog)s")
 
     group0 = parser.add_argument_group("Required Options")
     group0.add_argument("video", #type=file,
