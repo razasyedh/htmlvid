@@ -21,7 +21,6 @@ def error_out(short_arg, long_arg, message):
     doesn't support ArgumentTypeError.
     """
 
-
     sys.stderr.write("error: argument -%s/--%s: %s\n" % (short_arg,
                                                          long_arg, message))
     sys.exit(1)
@@ -232,6 +231,8 @@ def timestamp_to_ms(timestamp):
         hms[2][1] = 0
 
     millisec = (hms[0] * 3600 + hms[1] * 60 + hms[2][0]) * 1000 + hms[2][1]
+
+    print "Returning: ", millisec
     return millisec
 
 def calculate_duration(args):
@@ -381,11 +382,13 @@ def main():
     sys.exit(0)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.stderr.write("User sent keyboard interrupt. Exiting...")
+        exit(1)
 
-
-# reconsider timestamp format since you can convert everything to seconds
-# anyway or prepend the zeroes.
+# prepend the zeroes in timestamp
 
 # try variable bitrate only for -l (-b:v) and leave out the -crf
 # B:V (max bitrate for crf) might have no effect for mp4's. test it out, might
@@ -395,8 +398,6 @@ if __name__ == "__main__":
 
 # detect what flags ffmpeg was compiled with to remove unused options
 # (ffmpeg -hide_banner -buildconf)
-
-# pass the config arguments as a dictionary to argparse
 
 
 # https://trac.ffmpeg.org/wiki/Encode/VP8
