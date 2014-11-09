@@ -350,8 +350,15 @@ def build_cmd(args):
 
 def run_cmd(cmd, passes):
     """Takes the ffmpeg command list and runs it"""
-    cmd_list = cmd.split()
+    # Split the quoted filenames first, then concat the rest of the list
+    cmds = cmd.split("'")
+    cmd_list = cmds[0].split() + [cmds[1]] + cmds[2].split() + [cmds[3]]
+
     exit_code = subprocess.call(cmd_list)
+
+    if exit_code != 0:
+        print "ffmpeg exited with a nonzero error code(%d)" % exit_code
+        exit(1)
 
 def main():
     """Get options from config file and the command line. Then use them to
@@ -370,10 +377,7 @@ def main():
     else:
         passes = 1
 
-    run_cmd(command, passes)
-
-
-
+    # run_cmd(command, passes)
     sys.exit(0)
 
 if __name__ == "__main__":
