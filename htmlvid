@@ -74,8 +74,10 @@ def crf(string):
 
 def filesize(string):
     """Test if the filesize argument has a proper suffix."""
-    if string.endswith("K") or string.endswith("M"):
-        return string
+    number = string[:-1]
+    suffix = string[-1].upper()
+    if suffix == "K" or suffix == "M":
+        return number + suffix
     else:
         msg = "%r does not include a K or M suffix." % string
         error_out("b/-l", "bitrate/--limit", msg)
