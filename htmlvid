@@ -10,9 +10,12 @@ running the program with the '-h' option.
 
 import sys
 import os
-import time
 import configargparse
 import subprocess
+import shlex
+import shutil
+import tempfile
+import time
 
 
 def video_file(string):
@@ -85,6 +88,9 @@ def get_args():
 #CONFIGGGGG
     group1.add_argument("-c", "--config", metavar="file", is_config_file=True,
                         help="The path to a custom config file.")
+    group1.add_argument("-T", "--testrun", action="store_true",
+                        help="Don't actually run and display the ffmpeg"
+                             " command that would have been executed.")
     group1.add_argument("-v", "--verbose", action="count",
                         help="Use once to show ffmpeg output and twice to make"
                              " %(prog)s verbose also.")
@@ -108,6 +114,9 @@ def get_args():
                              " a different scale.")
     group3.add_argument("-S", "--sound", action="store_true",
                         help="Include sound.")
+    group3.add_argument("-M", "--metadata", metavar="title",
+                        help="Set the title of the video in the metadata."
+                             " (Default: filename)")
 
     group4 = parser.add_argument_group("Quality Options", "Use -l if you know"
                                        " size limit, else -q with -b")
@@ -270,10 +279,10 @@ def calculate_bitrate(limit, duration):
     return new_limit
 
 def get_full_duration(ffprobe, video_path):
-    cmd_list = cmd.split()
     """Run a command to get the duration of our input video."""
     cmd = "%s -i '%s'" % (ffprobe, video_path)
     cmd += " -loglevel error -show_entries format=duration"
+    cmd_list = shlex.split(cmd)
     print "Command to get video duration: ", cmd
 
     metadata = subprocess.check_output(cmd_list)
@@ -339,6 +348,9 @@ def build_cmd(args):
     if not args.sound:
         cmd += " -an"
 
+    if args.twopass:
+        cmd += " -pass 1"
+
     if args.metadata is None:
         meta_filename = os.path.basename(args.video)
         meta_filename = meta_filename[:-4]
@@ -356,33 +368,75 @@ def build_cmd(args):
     print cmd, "\n"
     return cmd
 
-def run_cmd(cmd, passes):
-    """Takes the ffmpeg command list and runs it"""
-    # Split the quoted filenames first, then concat the rest of the list
-    cmds = cmd.split("'")
-    cmd_list = cmds[0].split() + [cmds[1]] + cmds[2].split() + [cmds[3]]
+def get_temp_dir():
+    """Create a temporary directory to store our video and ffmpeg logs."""
+    temp_folder = tempfile.gettempdir()
+    temp_dir = temp_folder + os.sep + "htmlvid"
+    if not os.path.exists(temp_dir):
+        os.makedirs(temp_dir)
 
-    exit_code = subprocess.call(cmd_list)
+    return temp_dir
 
+def run_cmd(cmd):
+    """Takes the ffmpeg command and runs it."""
+
+    cmd_list = shlex.split(cmd)
+
+    # Set up the folder and file paths
+    working_dir = os.getcwd()
+    temp_dir = get_temp_dir()
+    filename = cmd_list[-1]
+    output_dir = os.path.dirname(filename)
+    output_file = os.path.basename(filename)
+    filepath = temp_dir + os.sep + output_file
+
+    # Find out if we're in the first pass of a twopass run
+    is_not_first_pass = False
+    if cmd.find("-pass 1") < 0:
+        is_not_first_pass = True
+
+    print temp_dir
+    print filename
+
+
+    # Run the ffmpeg command in the temp directory
+    ffmpeg_process = subprocess.Popen(cmd_list, cwd=temp_dir)
+
+    # Wait until ffmpeg exits and interpret the exit code
+    exit_code = None
+    while exit_code is None:
+        exit_code = subprocess.Popen.poll(ffmpeg_process)
     if exit_code != 0:
         print "ffmpeg exited with a nonzero error code(%d)" % exit_code
         exit(1)
+
+    # Move the video to our destination
+    if is_not_first_pass and output_dir == "":
+        shutil.move(filepath, working_dir)
 
 def main():
     """Get options from config file and the command line. Then use them to
     create and execute our ffmpeg command.
     """
-    arguments = get_args()
 
+    args = get_args()
 
-    command = build_cmd(arguments)
+    # Move or delete this!!!
+    argsdict = vars(args)
+    for key in argsdict:
+        print key, ":", argsdict[key]
+    print
 
-    if arguments.twopass:
-        passes = 2
-    else:
-        passes = 1
+    command = build_cmd(args)
 
-    # run_cmd(command, passes)
+    # Run the ffmpeg command if we're not testing and run twice if two passes
+    if not args.testrun:
+        run_cmd(command)
+        if args.twopass:
+            command2 = command.replace("-pass 1", "-pass 2")
+            print "Running pass 2"
+            run_cmd(command2)
+
     sys.exit(0)
 
 if __name__ == "__main__":
