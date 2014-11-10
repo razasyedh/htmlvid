@@ -2,15 +2,19 @@
 
 Here are some questions you might have.
 
-> My conversions are taking too long.
+> Where can I send a feature request or bug report?
+
+Open an issue on the github page and I'll see what I can do.
+
+> How can I make the conversions not take so long?
 
 Consider making the video width smaller (`-w`), or decreasing the bitrate. (`-b`) Two pass runs (`-p`) will take longer. Embedding subtitles (`-e`) will always take longer because instead of the usual fast seek, `FFmpeg` will have to seek from the start of the video to properly process the subtitles. Also, remember: try not to make your videos longer than 15 seconds.
 
-> The output looks blurry/bad.
+> How can I make the output look less blurry/bad?
 
 Consider increasing the bitrate (`-b`), especially if there is fast movement in the scene. You also might have set the quality (`-q`) value too high. (Lower is better)
 
-> The progress doesn't update enough.
+> Why doesn't the progress update fast enough?
 
 Unfortunately, `FFmpeg` only seems to report it's progress every ~700ms (the number varies widely) of the output duration, so the progress can only be that frequent. There is also a large delay in the beginning when `FFmpeg` doesn't report any progress at all, where it is probably processing and reading the input file.
 
@@ -26,14 +30,6 @@ Pass the following options to `FFmpeg` (`-O`): `-pix_fmt yuv420p -profile:v base
 
 `FFmpeg` has a lot of ways to tweak the output quality letting you choose between different modes and presets. The reason I only use the `-crf` and `-b:v` options is KISS (Keep It Simple Stupid). The more complicated options require better knowledge of `FFmpeg` and the video codecs which leads to more room for error. It is better suited for encoding large videos while our videos will be short snippets so we don't need that level of control. Lastly, the options for different codecs are widely different. (I already think it's too much to have to remember that `-crf` works on a different scale for WebM and MP4's.)
 
-> Why not just use `FFmpeg` directly?
-
-So you don't have to fumble with arcane `FFmpeg` syntax! (Instead you have to deal with `htmlvid`'s.) But seriously, `htmlvid` makes it much easier to simply create videos because it's options are specifically designed for the purpose. It's much more flexible in what type of options it takes and it solves many shortcomings of `FFmpeg`'s filters.
-
-> A GUI would be much more useful.
-
-I considered that. It would be pretty neat to have a thumbnail view of the video so you could choose the right times and a see the results of filters and such. Unfortunately I'm very new to programming, so maybe in some distant future.
-
 > What's up with the default filenames?
 
 I decided to experiment and use UNIX timestamps for the filenames. The time itself is not useful as files already have creation date metadata, but it serves to let you have the output videos ordered by creation time with short names.
@@ -48,11 +44,7 @@ So why would you still want to use WebM then? First, it's patent free. We should
 
 Use [`youtube-dl`](http://rg3.github.io/youtube-dl/) to download the file locally first or use [gfycat](http://www.gfycat.com/).
 
-> I have a feature/bug request.
-
-Open an issue and I'll see what I can do.
-
-## Filehosts
+> What filehosts can I use and what are their limitations?
 
 | | Host | Max. Duration | Max. Filesize | Sound |
 | ---: | :---: | :---: | :---: | :---: |
@@ -63,4 +55,6 @@ Open an issue and I'll see what I can do.
 | | pomf.se | None | 52 MB | ✓ |
 | | 4chan.org | 2 min | 3 MB | ✗ |
 
-For individual browser support see [here](http://www.w3schools.com/html/HTML5_video.asp) under "HTML Video - Browser Support". The gist of it is that Chrome and Firefox currently support both formats, while Safari and Internet Explorer only support MP4.
+> I want to embed the snippet directly. Which formats are supported by browsers?
+
+See [here](http://www.w3schools.com/html/HTML5_video.asp) under "HTML Video - Browser Support". The gist of it is that Chrome and Firefox currently support both formats, while Safari and Internet Explorer only support MP4.

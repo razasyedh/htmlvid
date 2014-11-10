@@ -1,4 +1,4 @@
-## How to install
+## Installing htmlvid
 
 *Note*: Since `htmlvid` is written in Python it should (ideally) work cross-platform. However, I can't guarantee it will work on Windows out of the box because I don't have access to a windows install. Let me know if it works for you, and if you had to tweak something, a pull request is welcome!
 
@@ -15,7 +15,7 @@ Make sure you have `configargparse` installed, either manually or by using `sudo
 
 Already have `FFmpeg`? You might not be finished yet! Read on.
 
-## How to get FFmpeg
+## Installing FFmpeg
 
 If you already have `FFmpeg` installed, check that it was built with support for  libvpx and libx264 by running `ffmpeg -buildconf` and looking for the lines `--enable-libvpx` and `--enable-libx264`. If it was, you're good to go.
 
