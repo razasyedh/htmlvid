@@ -36,7 +36,9 @@ You can set every option that you can specify on the command line in a config fi
 
 ## How to install
 
-Since `htmlvid` is written in python, it should ideally work cross-platform. (Have I tested it???) You can get it via `pip` by running this command:
+*Note*: Since `htmlvid` is written in Python it should (ideally) work cross-platform. However, I can't guarantee it will work on Windows out of the box because I don't have access to a windows install. Let me know if it works for you, and if you had to tweak something, a pull request is welcome!
+
+You can get it via `pip` by running this command:
 
     sudo pip install htmlvid
 
@@ -45,13 +47,17 @@ If you wish to install it manually, download the source code (Download Zip) and 
     cd /path/to/htmlvid
     python setup.py install
 
-Make sure you have `configargparse` installed. (Or `sudo pip install configargparse`)
+Make sure you have `configargparse` installed, either manually or by using `sudo pip install configargparse`.
+
+Already have `FFmpeg`? You might not be finished yet! Read on.
 
 ## How to get FFmpeg
 
-There are three ways to get `FFmpeg`. One is through your favorite package manager (if it includes support for libvpx and libx264). A second way is to download a prebuilt binary. The third way is to install from source.
+If you already have `FFmpeg` installed, check that it was built with support for  libvpx and libx264 by running `ffmpeg -buildconf` and looking for the lines `--enable-libvpx` and `--enable-libx264`. If it was, you're good to go.
 
-It is recommended for Window users to download the binary, mac users to use `homebrew`, and for linux users to install from source.
+There are three ways to get `FFmpeg`. One way is through your favorite package manager (if it includes support for libvpx and libx264). A second way is to download a prebuilt binary. The third way is to install from source.
+
+It is recommended for Mac users to use [homebrew](http://brew.sh/), for Linux users to install from source, and for Windows users to install the binary.
 
 ***Important:*** Each method uses it's own flags for compiling `FFmpeg` so not every feature of `htmlvid` might work. If you follow the recommended way for your OS, you shouldn't have a problem. Every method has support for both WebM and MP4.
 
@@ -82,6 +88,8 @@ You will have to use Jon Severinsson's PPA:
 *Note:* Because of some developments in July 2011, Ubuntu only offers `avconv`, a fork of `FFmpeg`. The two are not completely compatible and I will only be supporting `FFmpeg`. (If you really must use `avconv`, open `htmlvid.py` and set `FFMPEG_BIN` to `avconv` and `FFPROBE_BIN` to `avprobe` but I haven't tested it and I can't guarantee it'll work.)
 
 ### Installing from a binary
+
+Just go to the corresponding website for your operating system and download the build specified. You will then have to unpack the binary and either add it's location to your PATH, or move it to a directory already in your PATH. For Mac and Linux, I suggest moving it to `/usr/local/bin`. For Windows, follow [these instructions](http://www.wikihow.com/Install-FFmpeg-on-Windows#Enabling_FFmpeg_in_the_Command_Line_sub).
 
 ***Important:*** The OSX and Linux binaries do not include `ffprobe`, so you cannot use the `--duplicate` option along with the `--limit` option since it is needed to find out the full video duration.
 
@@ -147,7 +155,7 @@ The configuration flags we need are as follows:
 
 Finally, we can compile:
 
-    tar xjvf ffmpeg-x.x.x.tar.bz2 # extract archive
+    tar xjvf ffmpeg-x.x.x.tar.bz2 # Extract archive
     cd ffmpeg-x.x.x
     ./configure --enable-pthreads --enable-libvpx --enable-libvorbis --enable-libx264 --enable-libfdk-aac --enable-libass --enable-gpl --enable-nonfree
     sudo make install
@@ -231,7 +239,7 @@ Open an issue and I'll see what I can do.
 
 ## License
 
-`htmlvid` is licensed under the ...
+`htmlvid` is licensed under the MIT license. See `license.txt` for more details.
 
 ## References
 
