@@ -116,8 +116,10 @@ def get_args():
     epilog = ("Example: `htmlvid -s 2:10 -t 5 video.mkv` creates a 5 second"
               " snippet of video.mkv starting at 2 minutes and 10 seconds."
               "Author: Syed Raza <github.com/razasyedh>")
+    config_files = [os.path.expanduser("~" + os.sep + ".htmlvid"),
+                    "~/.config/.htmlvid", WINDOWS_CONFIG]
     parser = configargparse.ArgumentParser(add_help=False, prog="htmlvid",
-                                           default_config_files=["~/.htmlvid"],
+                                           default_config_files=config_files,
                                            add_config_file_help=False,
                                            description=description,
                                            epilog=epilog)
@@ -134,7 +136,8 @@ def get_args():
                              " timestamp is used.")
     group1.add_argument("-c", "--config", metavar="file", is_config_file=True,
                         help="The path to a custom config file. The default"
-                             " config file is located at ~/.htmlvid.")
+                             " config file is located at "
+                             "%s." % config_files[0])
     group1.add_argument("-v", "--verbose", action="count",
                         help="Use once to make %(prog)s verbose, twice to show"
                              " FFmpeg output, and three times for both.")
@@ -598,6 +601,7 @@ if __name__ == "__main__":
     else: # Unix
         FFMPEG_BIN = "ffmpeg"
         FFPROBE_BIN = "ffprobe"
+    WINDOWS_CONFIG = ""
     USE_ALL_THREADS = True # Whether to multithread or not
     MP4_PRESET = "slower" # libx264 default: medium
 
