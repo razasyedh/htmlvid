@@ -10,6 +10,8 @@
   - maybe a function that takes verbosity level. should print to stderr.
   - make verbosity a number instead?
 - remove default width??
+- Figure out why the MP4 preset is set to slow
+- make sure the escaping for filters and -O isn't OS specific
 - `ffmpeg -buildconf 2>NULLDEVICE` put info in epilog and verbose. `ENABLE_FLAGS_CHECK`
 - make pip package
 - package using pyinstaller or pyexe??

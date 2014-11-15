@@ -32,7 +32,13 @@ You can set every option that you can specify on the command line in a config fi
 
 ## Example usage
 
-... Show  two examples here. a simple one with just start and end time, and one with filters. Show the corresponding ffmpeg command??
+Here's a simple command to create a 5-second WebM from 5 minutes and 10 seconds into a video:
+
+    htmlvid -s 5:10 -t 5 -o snippet.webm video.mkv
+
+Here's a slightly more advanced command for creating a MP4 of a movie from the specified time ranges, limiting the size to 2 Megabytes, with a width of 400 pixels.
+
+    htmlvid -f mp4 -s 40:26.324 -t 40:38 -l 2M -w 400 movie.mkv
 
 ## Installing
 
@@ -50,11 +56,9 @@ For more help see [faq.md](./faq.md) and don't hesitate to reach out if somethin
 
 ## License
 
-`htmlvid` is licensed under the MIT license. See [license.txt](./license.txt) for more details.
+`htmlvid` is licensed under the MIT license.
 
 ## References
-
-<!--Clean this up!!!-->
 
 * [FFmpeg WebM Encoding Guide](https://trac.ffmpeg.org/wiki/Encode/VP8)
 
@@ -67,5 +71,3 @@ For more help see [faq.md](./faq.md) and don't hesitate to reach out if somethin
 * [FFmpeg Filters Documentation](https://www.ffmpeg.org/FFmpeg-filters.html)
 
 * [How To Replace avconv With (The Real) FFmpeg And Have It Work Right?](http://askubuntu.com/questions/373322/how-to-replace-avconv-with-the-real-ffmpeg-and-have-it-work-right)
-
-<!--Split into multiple files??-->

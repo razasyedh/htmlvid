@@ -93,8 +93,8 @@ The configuration flags we need are as follows:
     # For MP4 support
         --enable-libx264
 
-		# For MP4 sound
-		--enable-libfdk-aac
+    # For MP4 sound
+        --enable-libfdk-aac
         # You can also use libfaac or libvo-aacenc instead. Or you could exclude it entirely and rely on ffmpeg's experimental aac encoding.
         # libfdk_aac > libfaac > Native FFmpeg AAC ≥ libvo_aacenc (https://trac.ffmpeg.org/wiki/Encode/AAC)
         # --enable-libfaac
@@ -112,8 +112,8 @@ The configuration flags we need are as follows:
         --enable-pthreads
         # yasm is needed to optimize our build
         # texi2html is needed for documentation
-		# Optional mp3 support with libmp3lame
-		# --enable-libmp3lame
+        # Optional mp3 support with libmp3lame
+        # --enable-libmp3lame
 
 *Note:* These are just the minimum required flags needed for `htmlvid`. You might want to add more if you need support for other formats or if you use `ffmpeg` for other purposes. Run `./configure -help` for  a list of flags and their descriptions.
 
