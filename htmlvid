@@ -65,7 +65,7 @@ def snip_duration(string):
 def crf(string):
     """Test that the quality number is within the proper range."""
     quality = int(string)
-    if quality >= 0 and quality <= 63:
+    if 0 <= quality <= 63:
         return quality
     else:
         msg = "%s is out of the quality range. (0-63)" % string
@@ -94,9 +94,9 @@ def ffmpeg_options(string):
 
     # Check for options already used internally
     option_list = []
-    for word in string.split(" "):
-        if word[0] == "-":
-            option_list.append(word)
+    for option in string.split(" "):
+        if option[0] == "-":
+            option_list.append(option)
     blacklist = ["-ss", "-t", "-loglevel", "-threads", "-an", "-sn", "-vf"]
     matches = set(option_list).intersection(blacklist)
     if matches:
@@ -209,6 +209,7 @@ def get_args():
     # Display a help message and exit if the program is run without arguments
     if len(sys.argv) == 1:
         parser.print_help()
+        sys.exit(1)
 
     args = parser.parse_args()
     test_conflicts(args)
