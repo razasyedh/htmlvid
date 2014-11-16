@@ -14,6 +14,14 @@ Consider making the video width smaller (`-w`), or decreasing the bitrate. (`-b`
 
 Consider increasing the bitrate (`-b`), especially if there is fast movement in the scene. You also might have set the quality (`-q`) value too high. (Lower is better)
 
+> Why is FFmpeg giving the error "No such file or directory"?
+
+This is most likely due to problems with special characters in the path to your file or in a string you passed to `htmlvid`. There are two ways to remedy this:
+
+1. Temporarily remove *all* single quotes and backslashes from *every* directory leading to your file (or move the file to a safe directory) *and* the file's filename. I'm serious. This is the best solution unless you want to enter *\\\\\'escaping hell\\\\\'*.
+
+2. First read the FFmpeg documentation on [quoting and escaping for utilities](https://www.ffmpeg.org/ffmpeg-utils.html#Quoting-and-escaping) and [for filters](https://www.ffmpeg.org/ffmpeg-filters.html#Notes-on-filtergraph-escaping). Make sure you understand it. Then proceed to escape the special characters in your commandline invocation. You might need multiple escapes.
+
 > Why doesn't the progress update fast enough?
 
 Unfortunately, `FFmpeg` only seems to report it's progress every ~700ms (the number varies widely) of the output duration, so the progress can only be that frequent. There is also a large delay in the beginning when `FFmpeg` doesn't report any progress at all, where it is probably processing and reading the input file.

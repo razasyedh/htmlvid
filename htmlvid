@@ -178,8 +178,8 @@ def get_args():
                         help="Quality threshold. Lower is better. Defaults:"
                              " 10 for WebM (4-63) and 23 for MP4 (0-51).")
     group4.add_argument("-b", "--bitrate", metavar="rate", type=filesize,
-                        help="Maximum bitrate to use for WebM's. Must include K"
-                             " or M suffix. Default: 750K.")
+                        help="Maximum bitrate to use for WebM's. Must include"
+                             " K or M suffix. Default: 750K.")
     group4.add_argument("-l", "--limit", metavar="size", type=filesize,
                         help="Set quality and bitrate to fit in the maximum"
                              " specified size. Must include K or M suffix."
@@ -198,10 +198,12 @@ def get_args():
     group6 = parser.add_argument_group("Misc")
     group6.add_argument("-O", "--options", metavar="opts", type=ffmpeg_options,
                         help="Options to pass directly to FFmpeg. (Escape any"
-                             " dashes and quote spaces. ie: \\-foo 'bar baz')")
+                             " dashes and quote spaces for your shell. ie:"
+                             " \\-foo 'bar baz')")
     group6.add_argument("-F", "--filters", metavar="filt",
                         help="Filters to pass to FFmpeg's '-vf' option"
-                             " with commas separating them.")
+                             " with commas separating them. Escape any special"
+                             " characters.")
     group6.add_argument("-T", "--testrun", action="store_true",
                         help="Don't actually run and instead display the"
                              " FFmpeg command that would have been executed.")
@@ -217,6 +219,8 @@ def get_args():
 
     verbose_print("\n%s" % parser.format_values(), args.verbose)
     verbose_print_args(args)
+
+    escape_args(args)
 
     return args
 
@@ -293,6 +297,15 @@ def set_implied(args):
     else:
         if args.output[-4:] not in ["webm", ".mp4"]:
             args.output += ".%s" % args.format
+
+    return
+
+
+def escape_args(args):
+    """Properly escape string literals for FFmpeg."""
+    args.video = args.video.replace("'", "'\\''")
+    args.output = args.output.replace("'", "'\\''")
+    args.metadata = args.metadata.replace("'", "'\\''")
 
     return
 

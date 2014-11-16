@@ -70,4 +70,6 @@ For more help see [faq.md](./faq.md) and don't hesitate to reach out if somethin
 
 * [FFmpeg Filters Documentation](https://www.ffmpeg.org/FFmpeg-filters.html)
 
+* [FFmpeg Utilities Documentation](https://www.ffmpeg.org/ffmpeg-utils.html)
+
 * [How To Replace avconv With (The Real) FFmpeg And Have It Work Right?](http://askubuntu.com/questions/373322/how-to-replace-avconv-with-the-real-ffmpeg-and-have-it-work-right)
