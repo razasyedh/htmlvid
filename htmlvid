@@ -394,12 +394,19 @@ def calculate_bitrate(limit, duration):
     """Calculate the optimal bitrate for our size limit."""
     vid_duration = float(duration)
     size_limit = float(limit[:-1])
-    # Convert megabyte to kilobyte
+    # Convert megabytes to kilobytes
     if limit.endswith("M"):
         size_limit *= 1024
 
     bitrate = size_limit / vid_duration * 8
-    bitrate = str(round(bitrate, 2)) + "K"
+
+    if bitrate > 1024:
+        bitrate /= 1024
+        suffix = "M"
+    else:
+        suffix = "K"
+
+    bitrate = str(round(bitrate, 2)) + suffix
     return bitrate
 
 
