@@ -154,9 +154,10 @@ def get_args():
 
     group2 = parser.add_argument_group("Time Options",)
     group2.add_argument("-s", "--start", metavar="time", type=time_stamp,
-                        help="Time to start at in hh:mm:ss[.xxx] format.")
+                        help="Time to start at in hh:mm:ss[.m...] format. The"
+                             " m is for decimal seconds.")
     group2.add_argument("-t", "--to", metavar="dur", type=snip_duration,
-                        help="The duration in seconds and milliseconds. A"
+                        help="The duration in seconds and decimal seconds. A"
                              " timestamp can also be used.")
     group2.add_argument("-D", "--duplicate", action="store_true",
                         help="Copy whole video. (Incompatible with -s/-t)")
@@ -370,38 +371,23 @@ def get_filters(args):
     return filter_graph
 
 
-def timestamp_to_ms(timestamp):
-    """Break up a timestamp and convert it to milliseconds."""
-    # "hh" : "mm" : "ss.xxx"
+def timestamp_to_sec(timestamp):
+    """Break up a timestamp and convert it to seconds."""
+    # "hh" : "mm" : "ss[.m...]"
     hms = timestamp.split(":")
-    # Split seconds and milliseconds into sublist
-    hms[2] = hms[2].split(".")
-    # If there aren't any milliseconds
-    if len(hms[2]) != 2:
-        has_ms = False
-    else:
-        has_ms = True
+    sec = int(hms[0]) * 60 * 60 + int(hms[1]) * 60 + float(hms[2])
 
-    millisec = (int(hms[0]) * 3600 + int(hms[1]) * 60 + int(hms[2][0])) * 1000
-    if has_ms:
-        millisec += int(hms[2][1])
-
-    return millisec
+    return sec
 
 
 def calculate_duration(start, end):
     """Calculate the difference between two timestamps converted to ms."""
-    start_ms = timestamp_to_ms(start)
-    end_ms = timestamp_to_ms(end)
+    start_sec = timestamp_to_sec(start)
+    end_sec = timestamp_to_sec(end)
 
-    difference_ms = float(end_ms - start_ms)
-    difference_s = str(difference_ms / 1000)
+    difference_sec = end_sec - start_sec
 
-    # Remove trailing decimal zero
-    if difference_s.split(".")[1] == "0":
-        difference_s = difference_s[:-2]
-
-    return difference_s
+    return difference_sec
 
 
 def calculate_bitrate(limit, duration):
