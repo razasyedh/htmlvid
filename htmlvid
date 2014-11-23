@@ -21,7 +21,7 @@ import time
 def video_file(string):
     """Test that our video file exists."""
     exists = os.path.isfile(string)
-    if exists:
+    if exists or string == "-":
         return string
     else:
         msg = "File not found."
@@ -134,7 +134,8 @@ def get_args():
 
     group0 = parser.add_argument_group("Required Options")
     group0.add_argument("video", type=video_file,
-                        help="The path to the video file.")
+                        help="The path to the video file. Use '-' to read from"
+                             " stdin.")
 
     group1 = parser.add_argument_group("General Options")
     group1.add_argument("-h", "--help", action="help",
@@ -275,7 +276,7 @@ def set_implied(args):
     if args.testrun and (args.verbose is None or args.verbose == 2):
         args.verbose = 1
 
-    if args.metadata is None:
+    if args.metadata is None and args.video != "-":
         # Get filename without an extension
         fname = os.path.basename(args.video)
         args.metadata = os.path.splitext(fname)[0]
@@ -306,7 +307,8 @@ def escape_args(args):
     """Properly escape string literals for FFmpeg."""
     args.video = args.video.replace("'", "'\\''")
     args.output = args.output.replace("'", "'\\''")
-    args.metadata = args.metadata.replace("'", "'\\''")
+    if args.metadata is not None:
+        args.metadata = args.metadata.replace("'", "'\\''")
 
     return
 
@@ -412,12 +414,18 @@ def calculate_bitrate(limit, duration):
 
 def get_full_duration(video_path):
     """Run a command to get the duration of our input video."""
+    if video_path == "-":
+        video_path = "pipe:0"
+        sys_stdin = sys.stdin
+    else:
+        sys_stdin = None
+
     cmd = "%s -i '%s'" % (FFPROBE_BIN, video_path)
     cmd += " -loglevel error -show_entries format=duration"
     cmd_list = shlex.split(cmd)
 
     # Expected input: "[FORMAT]\nduration=s.xxxxx\n[/FORMAT]\n"
-    metadata = subprocess.check_output(cmd_list)
+    metadata = subprocess.check_output(cmd_list, stdin=sys_stdin)
     # Expected output: "duration=s.xxxxx"
     duration_line = metadata.splitlines()[1]
     # Expected output: "s.xxx"
@@ -450,7 +458,12 @@ def build_cmd(args):
         seek_cmd = " -ss %s" % args.start
     else:
         seek_cmd = ""
-    input_cmd = " -i '%s'" % args.video
+
+    if args.video != "-":
+        input_cmd = " -i '%s'" % args.video
+    else:
+        input_cmd = " -i pipe:0"
+
     if args.embed is None:
         # Fast seek if not embedding subs
         cmd = cmd + seek_cmd + input_cmd
@@ -489,7 +502,8 @@ def build_cmd(args):
     if args.twopass:
         cmd += " -pass 1"
 
-    cmd += " -metadata title='%s'" % args.metadata
+    if args.metadata is not None:
+        cmd += " -metadata title='%s'" % args.metadata
 
     if args.options is not None:
         cmd += " %s" % args.options
@@ -537,7 +551,7 @@ def print_progress(log_path, duration):
     return
 
 
-def run_cmd(command, duration, is_two_pass, verbosity):
+def run_cmd(command, input_video, duration, is_two_pass, verbosity):
     """Take the FFmpeg command and run it."""
 
     cmd_list = shlex.split(command)
@@ -576,8 +590,13 @@ def run_cmd(command, duration, is_two_pass, verbosity):
         msg = "Filename: %s\n" % filename
         verbose_print(msg, verbosity)
 
+    if input_video == "-":
+        sys_stdin = sys.stdin
+    else:
+        sys_stdin = None
+
     # Run the FFmpeg command in the temp directory
-    ffmpeg_process = subprocess.Popen(cmd_list, cwd=temp_dir)
+    ffmpeg_process = subprocess.Popen(cmd_list, stdin=sys_stdin, cwd=temp_dir)
 
     # Wait until FFmpeg exits and interpret the exit code
     exit_code = None
@@ -612,13 +631,13 @@ def main():
         if args.twopass:
             print "Running Pass 1"
 
-        run_cmd(command, args.to, args.twopass, args.verbose)
+        run_cmd(command, args.video, args.to, args.twopass, args.verbose)
 
         if args.twopass:
             command2 = command.replace("-pass 1", "-pass 2")
             print "Running pass 2"
 
-            run_cmd(command2, args.to, args.twopass, args.verbose)
+            run_cmd(command2, args.video, args.to, args.twopass, args.verbose)
 
     sys.exit(0)
 
