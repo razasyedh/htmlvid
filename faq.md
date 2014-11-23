@@ -48,7 +48,7 @@ Both [early](http://x264dev.multimedia.cx/archives/377) and [recent](https://gis
 
 So why would you still want to use WebM then? First, it's patent free. We should be supporting open formats. Second, the cons aren't bad enough to discount it for our use case. We can achieve decent quality and file size with WebM for our short snippets. Third, more websites support WebM uploads. Fourth, since we're usually uploading to hosts that will serve both WebM and MP4 depending on the browser, it doesn't matter which we choose. Lastly, both formats are being constantly worked on and their successors are in the works (H.265 and VP9), so there is room for improvement for both of them.
 
-> I want to use a youtube video.
+> How can I use a youtube video?
 
 Use [`youtube-dl`](http://rg3.github.io/youtube-dl/) to download the file locally first or use [gfycat](http://www.gfycat.com/).
 

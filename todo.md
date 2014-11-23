@@ -24,7 +24,6 @@
 - mp4 size with -l is a bit high. (also, compensate for sound)
   - 683k - 128k (desired audio bitrate) = 555k video bitrate
   - -b:a 128k # Acceptable values: 128/160/192/320
-- `calculate_duration()` has weird behavior with millisecond values. 5.5 counts as 5.005
 
 ## Planned Features
 
@@ -39,23 +38,30 @@
 - option to mux in sound?
   - option to chose which audio track to include?
 - gif support???
--  Option to upload result to gfycat/mediacrush?
-   - http://www.gfycat.com/api
-   - https://mediacru.sh/docs/api
-- sub-commands to concat/cut/convert_to_gif??
 
 ## Timeline
 
 - Finalize all encoding settings (for video and sound)
 - Fix command line experience (filenames, temp directory, configs, verbosity)
-- Implement minimum number of filters
+- Implement a minimum number of filters
 - Cross-platform testing and using different audio encoders
 - Create pip package and release
-- Implement more filters
-- Subcommands?
-- Ogg/gif support?
+- Continue Development
+  - Implement more filters
+  - Subcommands?
+  - Ogg/gif support?
+  - API uploading
 
-## Misc Info
+## Misc
+
+### Ideas
+
+- Interesting filters: lut, color, colorbalance, curves, deshake, gradfun,
+histeq, hue, smooth, pad, drawtext, drawbox?, removelogo, tile, vignette, zoompan?
+- Option to upload result to gfycat/mediacrush?
+   - http://www.gfycat.com/api
+   - https://mediacru.sh/docs/api
+- sub-commands to concat/cut/convert_to_gif??
 
 ### Modes
   b:v only: average bitrate mode
