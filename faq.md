@@ -6,13 +6,13 @@ Here are some questions you might have.
 
 Open an issue on the github page and I'll see what I can do.
 
-> How can I make the conversions not take so long?
+> How can I make a conversion faster?
 
-Consider making the video width smaller (`-w`), or decreasing the bitrate. (`-b`) Two pass runs (`-p`) will take longer. Embedding subtitles (`-e`) will always take longer because instead of the usual fast seek, `FFmpeg` will have to seek from the start of the video to properly process the subtitles. Also, remember: try not to make your videos longer than 15 seconds.
+Consider making the video width smaller (`-w`), or decreasing the bitrate. (`-b`) Embedding subtitles (`-e`) will always take longer because instead of the usual fast seek, `FFmpeg` will have to seek from the start of the video to properly process the subtitles. Also, remember: try not to make your videos longer than 15 seconds.
 
-> How can I make the output look less blurry/bad?
+> How can I make the output look less blocky?
 
-Consider increasing the bitrate (`-b`), especially if there is fast movement in the scene. You also might have set the quality (`-q`) value too high. (Lower is better)
+Consider increasing the bitrate (`-b`), especially if there is fast movement in the scene. You might also have set the quality (`-q`) value too high. (Lower is better)
 
 > Why is FFmpeg giving the error "No such file or directory"?
 
@@ -36,7 +36,7 @@ Pass the following options to `FFmpeg` (`-O`): `-pix_fmt yuv420p -profile:v base
 
 > Why don't you use *x* feature of FFmpeg/codec to get better quality and filesize?
 
-`FFmpeg` has a lot of ways to tweak the output quality letting you choose between different modes and presets. The reason I only use the `-crf` and `-b:v` options is KISS (Keep It Simple Stupid). The more complicated options require better knowledge of `FFmpeg` and the video codecs which leads to more room for error. It is better suited for encoding large videos while our videos will be short snippets so we don't need that level of control. Lastly, the options for different codecs are widely different. (I already think it's too much to have to remember that `-crf` works on a different scale for WebM and MP4's.)
+`FFmpeg` has a lot of ways to tweak the output quality letting you choose between different modes and presets. The reason I only use the `-crf` and `-b:v` options is KISS (Keep It Simple Stupid). The more complicated options require better knowledge of `FFmpeg` and the video codecs which leads to more room for error. They are better suited for encoding large videos while our videos will be short snippets so we don't need that level of control. Lastly, the options for different codecs are widely different. (I already think it's too much to have to remember that `-crf` works on a different scale for WebM and MP4's.)
 
 > What's up with the default filenames?
 

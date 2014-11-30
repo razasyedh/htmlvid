@@ -6,7 +6,7 @@ You can get it via `pip` by running this command:
 
     sudo pip install htmlvid
 
-If you wish to install it manually, download the source code (Download Zip) and run the following commands:
+If you wish to install it manually, [download the source code](https://github.com/razasyedh/htmlvid/archive/master.zip), unzip it, and run the following commands:
 
     cd /path/to/htmlvid
     python setup.py install
@@ -17,23 +17,25 @@ Already have `FFmpeg`? You might not be finished yet! Read on.
 
 ## Installing FFmpeg
 
-If you already have `FFmpeg` installed, check that it was built with support for  libvpx and libx264 by running `ffmpeg -buildconf` and looking for the lines `--enable-libvpx` and `--enable-libx264`. If it was, you're good to go.
+If you already have `FFmpeg` installed, check that it was built with support for libvpx and libx264 by running `ffmpeg -buildconf` and looking for the lines `--enable-libvpx` and `--enable-libx264`. If it was, you're good to go.
+
+<!--Include info about avconv deprecation warning here.-->
 
 There are three ways to get `FFmpeg`. One way is through your favorite package manager (if it includes support for libvpx and libx264). A second way is to download a prebuilt binary. The third way is to install from source.
 
-It is recommended for Mac users to use [homebrew](http://brew.sh/), for Linux users to install from source, and for Windows users to install the binary.
+It is recommended for Mac users to use homebrew, for Linux users to install from source, and for Windows users to install the binary.
 
 ***Important:*** Each method uses it's own flags for compiling `FFmpeg` so not every feature of `htmlvid` might work. If you follow the recommended way for your OS, you shouldn't have a problem. Every method has support for both WebM and MP4.
 
-### Installing from a package manager
+### Installing with a package manager
 
 #### OSX
 
-##### Homebrew
+##### [Homebrew](http://brew.sh/)
 
     brew install ffmpeg --with-libvpx --with-libvorbis --with-fdk-aac --with-libass
 
-##### Macports
+##### [Macports](https://www.macports.org/)
 
     sudo port install ffmpeg +vorbis +x264 +gpl +libfdk-aac +nonfree
 
@@ -41,7 +43,15 @@ It is recommended for Mac users to use [homebrew](http://brew.sh/), for Linux us
 
 ##### apt-get
 
-You will have to use Jon Severinsson's PPA:
+###### Ubuntu 15.04 Vivid Vervet and later
+
+    sudo apt-get install ffmpeg
+
+###### Previous Ubuntu Versions
+
+<!--TODO: Test if the Libav ffmpeg compatibility wrapper is sufficient for htmlvid. If so, users might be able to stick with avconv-->
+
+Because of some developments in July 2011, earlier Ubuntu versions only offer `avconv` from `Libav`, a fork of `FFmpeg`. The two are not completely compatible and I will only be supporting `FFmpeg`. You will have to uninstall `Libav` and use Jon Severinsson's PPA:
 
     sudo apt-get remove ffmpeg
     sudo apt-get purge libav-tools # Removes libav/avconv
@@ -49,11 +59,19 @@ You will have to use Jon Severinsson's PPA:
     sudo apt-get update
     sudo apt-get install ffmpeg
 
-*Note:* Because of some developments in July 2011, Ubuntu only offers `avconv`, a fork of `FFmpeg`. The two are not completely compatible and I will only be supporting `FFmpeg`. (If you really must use `avconv`, open `htmlvid.py` and set `FFMPEG_BIN` to `avconv` and `FFPROBE_BIN` to `avprobe` but I haven't tested it and I can't guarantee it'll work.)
+*Note:* If you really must use `avconv`, open `htmlvid.py` and set `FFMPEG_BIN` to `avconv` and `FFPROBE_BIN` to `avprobe` but I haven't tested it and I can't guarantee it'll work.
+
+#### Windows
+
+##### [chocolatey](https://chocolatey.org/)
+
+    choco install ffmpeg
+
+This downloads and installs from the same source as the instructions for the binary.
 
 ### Installing from a binary
 
-Just go to the corresponding website for your operating system and download the build specified. You will then have to unpack the binary and either add it's location to your PATH, or move it to a directory already in your PATH. For Mac and Linux, I suggest moving it to `/usr/local/bin`. For Windows, follow [these instructions](http://www.wikihow.com/Install-FFmpeg-on-Windows#Enabling_FFmpeg_in_the_Command_Line_sub).
+Just go to the corresponding website for your operating system and download the build specified. You will then have to unpack the binary and either add it's location to your `PATH`, or move it to a directory already in your `PATH`. For Mac and Linux, I suggest moving it to `/usr/local/bin`. For Windows, follow [these instructions](http://www.wikihow.com/Install-FFmpeg-on-Windows#Enabling_FFmpeg_in_the_Command_Line_sub).
 
 ***Important:*** The OSX and Linux binaries do not include `ffprobe`, so you cannot use the `--duplicate` option along with the `--limit` option since it is needed to find out the full video duration.
 
@@ -67,13 +85,13 @@ The latest build should be fine.
 
 http://johnvansickle.com/ffmpeg/
 
-Download one of the first two builds. (32-bit if you're unsure.)
+Download one of the first two builds. (32-bit if you're unsure)
 
 #### Windows
 
 http://ffmpeg.zeranoe.com/builds/
 
-Just download one of the static builds. (32-bit if you're unsure.)
+Just download one of the static builds. (32-bit if you're unsure)
 
 ### Installing from source
 
@@ -115,7 +133,7 @@ The configuration flags we need are as follows:
         # Optional mp3 support with libmp3lame
         # --enable-libmp3lame
 
-*Note:* These are just the minimum required flags needed for `htmlvid`. You might want to add more if you need support for other formats or if you use `ffmpeg` for other purposes. Run `./configure -help` for  a list of flags and their descriptions.
+*Note:* These are just the minimum required flags needed for `htmlvid`. You might want to add more if you need support for other formats or if you use `FFmpeg` for other purposes. Run `./configure -help` for  a list of flags and their descriptions.
 
 Finally, we can compile:
 
@@ -125,4 +143,3 @@ Finally, we can compile:
     sudo make install
 
 Congrats! You just compiled your own `FFmpeg` copy with all the features we need.
-

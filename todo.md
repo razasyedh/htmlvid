@@ -1,5 +1,7 @@
 ## Todo
 
+- make filters autoappend a list
+- s/User sent/Received/ --keyboard interrupt
 - take away bitrate option? Choose proper encoding modes.
 - linux + mac binaries don't contain ffprobe ... use `ffmpeg -i` instead?
 - try different thread numbers webM supposedly can't be 0
@@ -7,6 +9,8 @@
 - `\r` might not work on Windows. might need it on the end instead
 - embed filter (extract the subs) (libass needed?). Make the '0' argument optional?
 - fix what prints during each verbosity level and simplify the verbose code.
+  - `-q` option?
+  - use logging library?
   - maybe a function that takes verbosity level. should print to stderr.
   - make verbosity a number instead?
 - remove default width??
@@ -64,8 +68,8 @@ histeq, hue, smooth, pad, drawtext, drawbox?, removelogo, tile, vignette, zoompa
 - sub-commands to concat/cut/convert_to_gif??
 
 ### Modes
-  b:v only: average bitrate mode
-  b:v w/ minrate+maxrate: constant bitrate mode
-  crf only: constant quality mode
-  crf and b:v: b:v has no effect for MP4 and needed for max bitrate for webm
+  b:v only: average bitrate mode  
+  b:v w/ minrate+maxrate: constant bitrate mode  
+  crf only: constant quality mode  
+  crf and b:v: b:v has no effect for MP4 and needed for max bitrate for webm  
   constant quality mode is recommended for libpvx
