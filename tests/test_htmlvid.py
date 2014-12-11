@@ -1,12 +1,19 @@
 #!/usr/bin/env python
+"""
+htmlvid's test suite
+
+To run:
+    `cd htmlvid`
+    `python -B setup.py test`
+"""
 
 import unittest
-import htmlvid
+from htmlvid import htmlvid
 import configargparse
 
 class TestArgumentTests(unittest.TestCase):
     def test_video_file(self):
-        self.assertEqual("htmlvid", htmlvid.video_file("htmlvid"))
+        self.assertEqual("readme.md", htmlvid.video_file("readme.md"))
         self.assertRaises(configargparse.ArgumentTypeError,
                           htmlvid.video_file, "non_existant_file")
         self.assertEqual("-", htmlvid.video_file("-"))
