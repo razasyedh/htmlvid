@@ -42,7 +42,7 @@ Here's a slightly more advanced command for creating a MP4 of a movie from the s
 
 ## Installing
 
-Please see [installing.md](./installing.md)
+Please see [installing.md](./docs/installing.md)
 
 ## How to use
 
@@ -50,7 +50,7 @@ For help using `htmlvid`, run it with the `-h` option to see a nice help message
 
 The default config file is located at `~/.htmlvid`. Instructions for the config file and possible values for each option are documented inside the config file.
 
-For more help see [faq.md](./faq.md) and don't hesitate to reach out if something is unclear in the documentation.
+For more help see [faq.md](./docs/faq.md) and don't hesitate to reach out if something is unclear in the documentation.
 
 *Note:* If you are making these to share with others, try not to make the clips too long. Gfycat sets a 15 second limit on their videos and I think that's reasonable. If you plan to encode any longer than a few minutes, you should probably be using `FFmpeg` directly.
 
