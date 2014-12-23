@@ -20,7 +20,7 @@ If you were to just use `FFmpeg` without specifying options like `-b:v` and `-cr
 
 #### Get your desired quality easily
 
-It's very easy to tweak the quality and bitrate to your liking. Fast action scenes looking blurry? Just add more bitrate!  Have a huge 1920p video? Just set the output width and you'll get a file that is easier to share. You can even set a size limit on the output file.
+It's very easy to tweak the quality and bitrate to your liking. Fast action scenes looking blurry? Just add more bitrate. Have a huge 1920p video? Just set the output width and you'll get a file that is easier to share. You can even set a size limit on the output file.
 
 #### Configurable
 
@@ -28,7 +28,7 @@ You can set every option that you can specify on the command line in a config fi
 
 #### Filters
 
-`FFmpeg` has a large amount of filters. The most useful ones are integrated directly into `htmlvid` (eg: `scale` for changing the output width and `subtitles` for embedding subtitles.). If you find you need to use more filters, just give them to `htmlvid` (`-F`) and it'll pass them along.
+`FFmpeg` has a large amount of filters. The most useful ones are integrated directly into `htmlvid`for doing things like scaling the video and embedding subtitles. If you find you need to use more filters, just give them to `htmlvid` (`-F`) and it'll pass them along.
 
 ## Example usage
 
@@ -46,13 +46,11 @@ Please see [installing.md](./docs/installing.md)
 
 ## How to use
 
-For help using `htmlvid`, run it with the `-h` option to see a nice help message detailing each option. Technically, the only required option is the path to the video, but you'll most likely want to set the start time and video duration each time also. The quality and bitrate options already use sane defaults.
+For help using `htmlvid`, run it with the `-h` option to see a nice help message detailing each option. Technically, the only required option is the path to the video, but you'll most likely want to set the start time and video duration each time also. You can also tweak the default quality and bitrate.
 
 The default config file is located at `~/.htmlvid`. Instructions for the config file and possible values for each option are documented inside the config file.
 
-For more help see [faq.md](./docs/faq.md) and don't hesitate to reach out if something is unclear in the documentation.
-
-*Note:* If you are making these to share with others, try not to make the clips too long. Gfycat sets a 15 second limit on their videos and I think that's reasonable. If you plan to encode any longer than a few minutes, you should probably be using `FFmpeg` directly.
+For more help see [faq.md](./docs/faq.md).
 
 ## License
 

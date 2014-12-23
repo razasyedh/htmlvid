@@ -33,11 +33,28 @@ It is recommended for Mac users to use homebrew, for Linux users to install from
 
 ##### [Homebrew](http://brew.sh/)
 
+<!--https://github.com/Homebrew/homebrew/blob/master/Library/Formula/ffmpeg.rb-->
+
+    brew update
     brew install ffmpeg --with-libvpx --with-libvorbis --with-fdk-aac --with-libass
 
 ##### [Macports](https://www.macports.org/)
 
+<!--https://trac.macports.org/browser/trunk/dports/multimedia/ffmpeg/Portfile-->
+
+<!--TODO: Make sure this works. gel and nonfree seem to be variants, not flags-->
+    port sync
     sudo port install ffmpeg +vorbis +x264 +gpl +libfdk-aac +nonfree
+
+<!--Missing aac and ass
+##### [Fink](http://www.finkproject.org/)
+
+http://pdb.finkproject.org/pdb/package.php/ffmpeg
+
+    # From source
+    fink selfupdate
+    fink install ffmpeg
+-->
 
 #### Linux
 
@@ -45,11 +62,15 @@ It is recommended for Mac users to use homebrew, for Linux users to install from
 
 ###### Ubuntu 15.04 Vivid Vervet and later
 
+<!--https://launchpad.net/ubuntu/+source/ffmpeg-->
+
     sudo apt-get install ffmpeg
 
 ###### Previous Ubuntu Versions
 
 <!--TODO: Test if the Libav ffmpeg compatibility wrapper is sufficient for htmlvid. If so, users might be able to stick with avconv-->
+
+<!--https://launchpad.net/~jon-severinsson/+archive/ubuntu/ffmpeg-->
 
 Because of some developments in July 2011, earlier Ubuntu versions only offer `avconv` from `Libav`, a fork of `FFmpeg`. The two are not completely compatible and I will only be supporting `FFmpeg`. You will have to uninstall `Libav` and use Jon Severinsson's PPA:
 
@@ -64,6 +85,8 @@ Because of some developments in July 2011, earlier Ubuntu versions only offer `a
 #### Windows
 
 ##### [chocolatey](https://chocolatey.org/)
+
+<!--https://chocolatey.org/packages/ffmpeg-->
 
     choco install ffmpeg
 
